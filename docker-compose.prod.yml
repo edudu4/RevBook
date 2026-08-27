@@ -30,6 +30,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      COOKIE_DOMAIN: .revbook.com.br
+      COOKIE_SECURE: "true"
 
   review-service:
     image: ghcr.io/${GHCR_OWNER}/revbook-review-service:latest

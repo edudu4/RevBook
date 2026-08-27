@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, useRoute } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,6 +9,7 @@ import { paraComentarioComResenha, paraEstatisticas, paraResenha } from '@/lib/m
 import type { ComentarioComResenha, EstatisticasUsuario, Resenha } from '@/types/dominio';
 
 export default function Profile() {
+  const [, params] = useRoute('/users/:id');
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
   const [resenhas, setResenhas] = useState<Resenha[]>([]);
@@ -17,34 +18,37 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [abaAtiva, setAbaAtiva] = useState<'resenhas' | 'comentarios'>('resenhas');
 
+  const usuarioIdRota = params?.id ? Number(params.id) : undefined;
+  const ehProprioPerfil = usuarioIdRota === undefined || usuarioIdRota === user?.id;
+  const usuarioId = usuarioIdRota ?? user?.id;
+
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (ehProprioPerfil && !isAuthenticated) {
       setLocation('/login');
       return;
     }
+    if (!usuarioId) return;
 
-    buscarDadosDoUsuario();
-  }, [isAuthenticated, user]);
+    buscarDadosDoUsuario(usuarioId);
+  }, [usuarioId, ehProprioPerfil, isAuthenticated]);
 
-  const buscarDadosDoUsuario = async () => {
-    if (!user?.id) return;
-
+  const buscarDadosDoUsuario = async (id: number) => {
     try {
       setLoading(true);
 
-      const statsResponse = await fetch(`${API_BASE_URL}/users/${user.id}/profile`);
+      const statsResponse = await fetch(`${API_BASE_URL}/users/${id}/profile`);
       if (statsResponse.ok) {
         const statsData: UserStatsApi = await statsResponse.json();
         setEstatisticas(paraEstatisticas(statsData));
       }
 
-      const resenhasResponse = await fetch(`${API_BASE_URL}/users/${user.id}/reviews`);
+      const resenhasResponse = await fetch(`${API_BASE_URL}/users/${id}/reviews`);
       if (resenhasResponse.ok) {
         const resenhasData: ReviewApi[] = await resenhasResponse.json();
         setResenhas(resenhasData.map(paraResenha));
       }
 
-      const comentariosResponse = await fetch(`${API_BASE_URL}/users/${user.id}/comments`);
+      const comentariosResponse = await fetch(`${API_BASE_URL}/users/${id}/comments`);
       if (comentariosResponse.ok) {
         const comentariosData: CommentWithReviewApi[] = await comentariosResponse.json();
         setComentarios(comentariosData.map(paraComentarioComResenha));
@@ -55,6 +59,9 @@ export default function Profile() {
       setLoading(false);
     }
   };
+
+  const nomeExibido = ehProprioPerfil ? user?.nome : estatisticas?.nomeUsuario;
+  const avatarExibido = ehProprioPerfil ? user?.avatar : estatisticas?.avatarUsuario;
 
   if (loading) {
     return (
@@ -76,7 +83,9 @@ export default function Profile() {
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-3xl font-bold text-foreground">Meu Perfil</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            {ehProprioPerfil ? 'Meu Perfil' : `Perfil de ${nomeExibido ?? '...'}`}
+          </h1>
         </div>
       </header>
 
@@ -86,14 +95,14 @@ export default function Profile() {
         <div className="bg-card border border-border rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6 mb-8">
             <Avatar className="size-24">
-              <AvatarImage src={user?.avatar} alt={user?.nome} />
+              <AvatarImage src={avatarExibido} alt={nomeExibido} />
               <AvatarFallback className="text-4xl font-bold">
-                {user?.nome?.charAt(0).toUpperCase()}
+                {nomeExibido?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">{user?.nome}</h2>
-              <p className="text-muted-foreground">{user?.email}</p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{nomeExibido}</h2>
+              {ehProprioPerfil && <p className="text-muted-foreground">{user?.email}</p>}
             </div>
           </div>
 
@@ -142,7 +151,7 @@ export default function Profile() {
             >
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
-                Minhas Resenhas ({resenhas.length})
+                {ehProprioPerfil ? 'Minhas Resenhas' : 'Resenhas'} ({resenhas.length})
               </div>
             </button>
             <button
@@ -155,7 +164,7 @@ export default function Profile() {
             >
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
-                Meus Comentários ({comentarios.length})
+                {ehProprioPerfil ? 'Meus Comentários' : 'Comentários'} ({comentarios.length})
               </div>
             </button>
           </div>
@@ -167,7 +176,9 @@ export default function Profile() {
             {resenhas.length === 0 ? (
               <div className="text-center py-12 bg-muted rounded-lg">
                 <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Você ainda não escreveu nenhuma resenha</p>
+                <p className="text-muted-foreground mb-4">
+                  {ehProprioPerfil ? 'Você ainda não escreveu nenhuma resenha' : 'Este usuário ainda não escreveu nenhuma resenha'}
+                </p>
                 <Button
                   onClick={() => setLocation('/')}
                   className="bg-accent text-accent-foreground hover:bg-accent/90"
@@ -219,7 +230,9 @@ export default function Profile() {
             {comentarios.length === 0 ? (
               <div className="text-center py-12 bg-muted rounded-lg">
                 <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Você ainda não escreveu nenhum comentário</p>
+                <p className="text-muted-foreground mb-4">
+                  {ehProprioPerfil ? 'Você ainda não escreveu nenhum comentário' : 'Este usuário ainda não escreveu nenhum comentário'}
+                </p>
                 <Button
                   onClick={() => setLocation('/')}
                   className="bg-accent text-accent-foreground hover:bg-accent/90"

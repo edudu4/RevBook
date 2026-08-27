@@ -7,10 +7,7 @@ export interface UserApi {
   avatar?: string;
 }
 
-export interface LoginApiResponse {
-  access_token: string;
-  user: UserApi;
-}
+export type LoginApiResponse = UserApi;
 
 export interface RatingApi {
   id: number;
@@ -79,4 +76,6 @@ export interface UserStatsApi {
   reviewCount: number;
   commentCount: number;
   totalRatingsReceived: number;
+  userName?: string;
+  userAvatar?: string;
 }

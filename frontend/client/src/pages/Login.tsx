@@ -34,13 +34,14 @@ export default function Login() {
     try {
       const result = await fetch(`${API_BASE_URL}/auth/google`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: response.credential }),
       });
 
       if (result.ok) {
         const data: LoginApiResponse = await result.json();
-        login(data.access_token, paraUsuario(data.user));
+        login(paraUsuario(data));
         setLocation('/');
       }
     } catch (error) {

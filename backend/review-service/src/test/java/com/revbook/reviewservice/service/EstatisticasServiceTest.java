@@ -3,6 +3,7 @@ package com.revbook.reviewservice.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.revbook.reviewservice.domain.Comentario;
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
@@ -45,5 +46,24 @@ class EstatisticasServiceTest {
         assertThat(resultado.reviewCount()).isEqualTo(2);
         assertThat(resultado.commentCount()).isEqualTo(4);
         assertThat(resultado.totalRatingsReceived()).isEqualTo(7);
+        assertThat(resultado.userName()).isEqualTo("Fulano");
+    }
+
+    @Test
+    void calcular_devePreencherNomeEAvatarViaComentario_quandoUsuarioNaoTemResenhas() {
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Resenha resenha = new Resenha(livro, "Ótimo", 2L, "Outro Autor", null);
+        Comentario comentario = new Comentario("Boa resenha", 1L, "Fulano", "https://avatar/fulano.png", resenha);
+
+        when(resenhaRepository.findByUsuarioIdOrderByCriadoEmDesc(1L)).thenReturn(List.of());
+        when(comentarioRepository.countByUsuarioId(1L)).thenReturn(1L);
+        when(comentarioRepository.findByUsuarioIdOrderByCriadoEmDesc(1L)).thenReturn(List.of(comentario));
+        when(avaliacaoRepository.countByResenha_UsuarioId(1L)).thenReturn(0L);
+
+        var resultado = estatisticasService.calcular(1L);
+
+        assertThat(resultado.reviewCount()).isEqualTo(0);
+        assertThat(resultado.userName()).isEqualTo("Fulano");
+        assertThat(resultado.userAvatar()).isEqualTo("https://avatar/fulano.png");
     }
 }

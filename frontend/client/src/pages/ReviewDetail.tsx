@@ -13,7 +13,7 @@ import type { Resenha } from '@/types/dominio';
 export default function ReviewDetail() {
   const [, params] = useRoute('/reviews/:id');
   const [, setLocation] = useLocation();
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [resenha, setResenha] = useState<Resenha | null>(null);
   const [loading, setLoading] = useState(true);
   const [naoEncontrada, setNaoEncontrada] = useState(false);
@@ -48,7 +48,7 @@ export default function ReviewDetail() {
   };
 
   const handleAvaliar = async (valor: number) => {
-    if (!token || !resenhaId) {
+    if (!isAuthenticated || !resenhaId) {
       setLocation('/login');
       return;
     }
@@ -56,9 +56,9 @@ export default function ReviewDetail() {
     try {
       await fetch(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ reviewId: Number(resenhaId), value: valor }),
       });
@@ -69,14 +69,14 @@ export default function ReviewDetail() {
   };
 
   const handleAtualizar = async () => {
-    if (!token || !resenhaId || !conteudoEdicao.trim()) return;
+    if (!isAuthenticated || !resenhaId || !conteudoEdicao.trim()) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: conteudoEdicao }),
       });
@@ -91,15 +91,13 @@ export default function ReviewDetail() {
   };
 
   const handleExcluir = async () => {
-    if (!token || !resenhaId) return;
+    if (!isAuthenticated || !resenhaId) return;
     if (!confirm('Tem certeza que deseja excluir esta resenha? Essa ação não pode ser desfeita.')) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -173,7 +171,10 @@ export default function ReviewDetail() {
           </div>
 
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
-            <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-3 w-fit hover:opacity-80"
+              onClick={() => setLocation(`/users/${resenha.usuarioId}`)}
+            >
               <Avatar>
                 <AvatarImage src={resenha.avatarUsuario} alt={resenha.nomeUsuario} />
                 <AvatarFallback>{resenha.nomeUsuario.charAt(0).toUpperCase()}</AvatarFallback>

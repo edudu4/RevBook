@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -11,27 +11,69 @@ import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib
 import { paraResenha } from '@/lib/mapeadores';
 import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
 
+const TAMANHO_PAGINA = 10;
+
 export default function Home() {
   const [, setLocation] = useLocation();
-  const { user, token, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const [resenhas, setResenhas] = useState<Resenha[]>([]);
   const [loading, setLoading] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  const [temMais, setTemMais] = useState(true);
   const [showNewReviewModal, setShowNewReviewModal] = useState(false);
   const [livroSelecionado, setLivroSelecionado] = useState<LivroEncontrado | null>(null);
   const [conteudoResenha, setConteudoResenha] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
+  const paginaRef = useRef(0);
+  const carregandoRef = useRef(false);
+  const temMaisRef = useRef(true);
+  const filtrosAtivosRef = useRef<FiltrosBusca | null>(null);
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+
+  const montarUrlPagina = (pagina: number, filtros: FiltrosBusca | null) => {
+    const params = new URLSearchParams();
+    if (filtros?.titulo) params.append('title', filtros.titulo);
+    if (filtros?.autor) params.append('author', filtros.autor);
+    if (filtros?.genero) params.append('genre', filtros.genero);
+    params.append('page', String(pagina));
+    params.append('size', String(TAMANHO_PAGINA));
+    const base = filtros ? `${API_BASE_URL}/reviews/search` : `${API_BASE_URL}/reviews`;
+    return `${base}?${params}`;
+  };
+
   useEffect(() => {
     buscarResenhas();
+  }, []);
+
+  useEffect(() => {
+    const sentinela = sentinelaRef.current;
+    if (!sentinela) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          carregarMais();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(sentinela);
+    return () => observer.disconnect();
   }, []);
 
   const buscarResenhas = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/reviews`);
+      filtrosAtivosRef.current = null;
+      const response = await fetch(montarUrlPagina(0, null));
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
-        setResenhas(data.map(paraResenha));
+        const mapeadas = data.map(paraResenha);
+        setResenhas(mapeadas);
+        paginaRef.current = 1;
+        temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
+        setTemMais(temMaisRef.current);
       }
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
@@ -44,16 +86,16 @@ export default function Home() {
     try {
       setLoading(true);
       setIsSearching(true);
+      filtrosAtivosRef.current = filtros;
 
-      const params = new URLSearchParams();
-      if (filtros.titulo) params.append('title', filtros.titulo);
-      if (filtros.autor) params.append('author', filtros.autor);
-      if (filtros.genero) params.append('genre', filtros.genero);
-
-      const response = await fetch(`${API_BASE_URL}/reviews/search?${params}`);
+      const response = await fetch(montarUrlPagina(0, filtros));
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
-        setResenhas(data.map(paraResenha));
+        const mapeadas = data.map(paraResenha);
+        setResenhas(mapeadas);
+        paginaRef.current = 1;
+        temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
+        setTemMais(temMaisRef.current);
       }
     } catch (error) {
       console.error('Failed to search reviews:', error);
@@ -67,8 +109,31 @@ export default function Home() {
     buscarResenhas();
   };
 
+  const carregarMais = async () => {
+    if (carregandoRef.current || !temMaisRef.current) return;
+
+    carregandoRef.current = true;
+    setCarregandoMais(true);
+    try {
+      const response = await fetch(montarUrlPagina(paginaRef.current, filtrosAtivosRef.current));
+      if (response.ok) {
+        const data: ReviewApi[] = await response.json();
+        const mapeadas = data.map(paraResenha);
+        setResenhas((atual) => [...atual, ...mapeadas]);
+        paginaRef.current += 1;
+        temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
+        setTemMais(temMaisRef.current);
+      }
+    } catch (error) {
+      console.error('Failed to load more reviews:', error);
+    } finally {
+      carregandoRef.current = false;
+      setCarregandoMais(false);
+    }
+  };
+
   const handleCriarResenha = async () => {
-    if (!token || !livroSelecionado || !conteudoResenha) {
+    if (!isAuthenticated || !livroSelecionado || !conteudoResenha) {
       alert('Por favor, escolha um livro e escreva o conteúdo da resenha');
       return;
     }
@@ -85,9 +150,9 @@ export default function Home() {
 
       const response = await fetch(`${API_BASE_URL}/reviews`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(corpo),
       });
@@ -104,7 +169,7 @@ export default function Home() {
   };
 
   const handleAvaliarResenha = async (resenhaId: number, valor: number) => {
-    if (!token) {
+    if (!isAuthenticated) {
       setLocation('/login');
       return;
     }
@@ -112,9 +177,9 @@ export default function Home() {
     try {
       await fetch(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ reviewId: resenhaId, value: valor }),
       });
@@ -249,7 +314,13 @@ export default function Home() {
                         </>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div
+                      className="flex items-center gap-2 mt-2 w-fit hover:opacity-80"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/users/${resenha.usuarioId}`);
+                      }}
+                    >
                       <Avatar className="size-6">
                         <AvatarImage src={resenha.avatarUsuario} alt={resenha.nomeUsuario} />
                         <AvatarFallback className="text-xs">
@@ -300,6 +371,16 @@ export default function Home() {
             </article>
           ))}
         </div>
+
+        {/* Infinite Scroll Sentinel */}
+        {!loading && resenhas.length > 0 && (
+          <div ref={sentinelaRef} className="py-8 text-center">
+            {carregandoMais && <p className="text-muted-foreground">Carregando mais resenhas...</p>}
+            {!temMais && !carregandoMais && (
+              <p className="text-muted-foreground text-sm">Você chegou ao fim das resenhas.</p>
+            )}
+          </div>
+        )}
       </main>
 
       {/* New Review Modal */}

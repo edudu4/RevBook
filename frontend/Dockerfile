@@ -5,6 +5,9 @@ COPY package.json pnpm-lock.yaml ./
 COPY patches ./patches
 RUN pnpm install --frozen-lockfile
 COPY . .
+# URL pública do Gateway — precisa existir em build time, o Vite embute no bundle estático.
+ARG VITE_API_BASE_URL=http://localhost:3001
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm build
 
 FROM node:20-alpine

@@ -5,7 +5,8 @@
  * de domínio em `types/dominio.ts`, convertidos por `lib/mapeadores.ts`.
  */
 
-export const API_BASE_URL = 'http://localhost:3001';
+/** Em produção, defina VITE_API_BASE_URL no build (aponta pro Gateway real). */
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export interface UserApi {
   id: number;

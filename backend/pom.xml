@@ -53,10 +53,22 @@
     </plugins>
     <pluginManagement>
       <plugins>
+        <!-- Sem herdar de spring-boot-starter-parent, o goal "repackage" não é
+             ligado à fase "package" automaticamente — sem isto, "mvn package"
+             gera um jar comum (sem Main-Class), que falha com "no main
+             manifest attribute" ao rodar "java -jar" (só não aparecia local
+             porque "mvn spring-boot:run" não depende do jar empacotado). -->
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring-boot.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

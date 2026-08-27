@@ -3,12 +3,15 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Footer from '@/components/Footer';
+import Spinner from '@/components/Spinner';
 import SearchBar from '@/components/SearchBar';
 import BuscaLivro from '@/components/BuscaLivro';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
 import { LogOut, Plus } from 'lucide-react';
 import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib/api';
 import { paraResenha } from '@/lib/mapeadores';
+import { preloadImagens } from '@/lib/preloadImagens';
 import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
 
 const TAMANHO_PAGINA = 10;
@@ -54,6 +57,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas(mapeadas);
         paginaRef.current = 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -76,6 +80,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas(mapeadas);
         paginaRef.current = 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -103,6 +108,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas((atual) => [...atual, ...mapeadas]);
         paginaRef.current += 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -190,10 +196,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <span
               className="flex items-center justify-center w-9 h-9 rounded-md font-bold text-lg flex-shrink-0"
@@ -255,7 +261,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-12">
         {/* Search Bar */}
         <SearchBar onSearch={handleBuscar} onClear={handleLimparBusca} />
 
@@ -269,11 +275,7 @@ export default function Home() {
         )}
 
         {/* Loading State */}
-        {loading && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Carregando resenhas...</p>
-          </div>
-        )}
+        {loading && <Spinner label="Carregando resenhas..." />}
 
         {/* Empty State */}
         {!loading && resenhas.length === 0 && (
@@ -386,12 +388,14 @@ export default function Home() {
 
         {/* Infinite Scroll Sentinel */}
         <div ref={sentinelaRef} className={resenhas.length > 0 ? 'py-8 text-center' : ''}>
-          {carregandoMais && <p className="text-muted-foreground">Carregando mais resenhas...</p>}
+          {carregandoMais && <Spinner label="Carregando mais resenhas..." tamanho="pequeno" />}
           {!loading && !temMais && !carregandoMais && resenhas.length > 0 && (
             <p className="text-muted-foreground text-sm">Você chegou ao fim das resenhas.</p>
           )}
         </div>
       </main>
+
+      <Footer />
 
       {/* New Review Modal */}
       {showNewReviewModal && (

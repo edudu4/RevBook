@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import Spinner from '@/components/Spinner';
 import { API_BASE_URL, type BookSearchResultApi } from '@/lib/api';
 import { paraLivroEncontrado } from '@/lib/mapeadores';
 import type { LivroEncontrado } from '@/types/dominio';
@@ -107,7 +108,7 @@ export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }:
 
       {mostrarResultados && buscando && (
         <div className="absolute z-10 mt-1 w-full bg-card border border-border rounded-lg shadow-lg p-3">
-          <p className="text-sm text-muted-foreground">Buscando...</p>
+          <Spinner label="Buscando..." tamanho="pequeno" />
         </div>
       )}
 

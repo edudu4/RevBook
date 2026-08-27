@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
 import CommentsSection from '@/components/CommentsSection';
+import Footer from '@/components/Footer';
+import Spinner from '@/components/Spinner';
 import { ArrowLeft, Edit2, Trash2, Check, X } from 'lucide-react';
 import { API_BASE_URL, type ReviewApi } from '@/lib/api';
 import { paraResenha } from '@/lib/mapeadores';
+import { preloadImagens } from '@/lib/preloadImagens';
 import type { Resenha } from '@/types/dominio';
 
 export default function ReviewDetail() {
@@ -35,7 +38,9 @@ export default function ReviewDetail() {
       const response = await fetch(`${API_BASE_URL}/reviews/${id}`);
       if (response.ok) {
         const data: ReviewApi = await response.json();
-        setResenha(paraResenha(data));
+        const mapeada = paraResenha(data);
+        await preloadImagens([mapeada.capaUrl, mapeada.avatarUsuario]);
+        setResenha(mapeada);
       } else {
         setNaoEncontrada(true);
       }
@@ -109,11 +114,7 @@ export default function ReviewDetail() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Carregando resenha...</p>
-      </div>
-    );
+    return <Spinner label="Carregando resenha..." telaCheia />;
   }
 
   if (naoEncontrada || !resenha) {
@@ -133,7 +134,7 @@ export default function ReviewDetail() {
   const ehDono = isAuthenticated && user?.id === resenha.usuarioId;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="bg-card border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-6 flex items-center gap-4">
           <Button onClick={() => setLocation('/')} variant="ghost" size="sm">
@@ -238,6 +239,8 @@ export default function ReviewDetail() {
           <CommentsSection resenhaId={resenha.id} />
         </article>
       </main>
+
+      <Footer />
     </div>
   );
 }

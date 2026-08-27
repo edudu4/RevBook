@@ -3,9 +3,12 @@ import { useLocation, useRoute } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Footer from '@/components/Footer';
+import Spinner from '@/components/Spinner';
 import { ArrowLeft, BookOpen, MessageSquare, Award } from 'lucide-react';
 import { API_BASE_URL, type CommentWithReviewApi, type ReviewApi, type UserStatsApi } from '@/lib/api';
 import { paraComentarioComResenha, paraEstatisticas, paraResenha } from '@/lib/mapeadores';
+import { preloadImagens } from '@/lib/preloadImagens';
 import type { ComentarioComResenha, EstatisticasUsuario, Resenha } from '@/types/dominio';
 
 export default function Profile() {
@@ -37,9 +40,12 @@ export default function Profile() {
       setLoading(true);
 
       const statsResponse = await fetch(`${API_BASE_URL}/users/${id}/profile`);
+      let avatarCarregado: string | undefined;
       if (statsResponse.ok) {
         const statsData: UserStatsApi = await statsResponse.json();
-        setEstatisticas(paraEstatisticas(statsData));
+        const stats = paraEstatisticas(statsData);
+        avatarCarregado = stats.avatarUsuario;
+        setEstatisticas(stats);
       }
 
       const resenhasResponse = await fetch(`${API_BASE_URL}/users/${id}/reviews`);
@@ -53,6 +59,8 @@ export default function Profile() {
         const comentariosData: CommentWithReviewApi[] = await comentariosResponse.json();
         setComentarios(comentariosData.map(paraComentarioComResenha));
       }
+
+      await preloadImagens([user?.avatar, avatarCarregado]);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
@@ -64,18 +72,14 @@ export default function Profile() {
   const avatarExibido = ehProprioPerfil ? user?.avatar : estatisticas?.avatarUsuario;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Carregando perfil...</p>
-      </div>
-    );
+    return <Spinner label="Carregando perfil..." telaCheia />;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center gap-4">
           <Button
             onClick={() => setLocation('/')}
             variant="ghost"
@@ -90,7 +94,7 @@ export default function Profile() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-12">
         {/* Profile Header */}
         <div className="bg-card border border-border rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6 mb-8">
@@ -276,6 +280,8 @@ export default function Profile() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

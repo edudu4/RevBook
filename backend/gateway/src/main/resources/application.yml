@@ -1,0 +1,44 @@
+server:
+  port: 3001
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8877
+          predicates:
+            - Path=/auth/**
+        - id: review-service-reviews
+          uri: http://localhost:8878
+          predicates:
+            - Path=/reviews/**
+        - id: review-service-genres
+          uri: http://localhost:8878
+          predicates:
+            - Path=/genres
+        - id: review-service-comments
+          uri: http://localhost:8878
+          predicates:
+            - Path=/comments/**
+        - id: review-service-reactions
+          uri: http://localhost:8878
+          predicates:
+            - Path=/reactions/**
+        - id: review-service-users
+          uri: http://localhost:8878
+          predicates:
+            - Path=/users/**
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+revbook:
+  jwt:
+    # Chave HMAC compartilhada com auth-service e review-service (mesmo valor nos 3 application.yml).
+    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"

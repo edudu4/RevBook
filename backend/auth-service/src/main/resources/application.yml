@@ -1,0 +1,25 @@
+server:
+  port: 8877
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auth_db
+    username: revbook
+    password: revbook
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+revbook:
+  jwt:
+    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
+    expiration-minutes: 60

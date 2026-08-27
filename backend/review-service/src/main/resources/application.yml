@@ -1,0 +1,24 @@
+server:
+  port: 8878
+
+spring:
+  application:
+    name: review-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/review_db
+    username: revbook
+    password: revbook
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+revbook:
+  jwt:
+    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"

@@ -19,7 +19,7 @@ export default function Login() {
     script.onload = () => {
       if ((window as any).google) {
         (window as any).google.accounts.id.initialize({
-          client_id: 'YOUR_GOOGLE_CLIENT_ID',
+          client_id: '838028623479-f78tmi9dhg21uvbq2ck5jdkp964ucts6.apps.googleusercontent.com',
           callback: handleCredentialResponse,
         });
         (window as any).google.accounts.id.renderButton(

@@ -23,3 +23,5 @@ revbook:
   jwt:
     secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
     expiration-minutes: 60
+  google:
+    client-id: "838028623479-f78tmi9dhg21uvbq2ck5jdkp964ucts6.apps.googleusercontent.com"

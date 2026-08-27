@@ -1,6 +1,3 @@
-# Deploy de produção — todos os serviços num único host (EC2), puxando as imagens
-# já publicadas pelo GitHub Actions no GHCR. Preencha um .env ao lado deste arquivo
-# com os valores reais (ver .env.example).
 services:
   postgres:
     image: postgres:16-alpine
@@ -63,8 +60,6 @@ services:
     depends_on:
       - gateway
 
-  # Único ponto de entrada público — termina HTTPS (Let's Encrypt automático) e
-  # encaminha pra frontend/gateway pela rede interna do compose.
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped

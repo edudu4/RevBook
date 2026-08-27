@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ export default function Home() {
   const carregandoRef = useRef(false);
   const temMaisRef = useRef(true);
   const filtrosAtivosRef = useRef<FiltrosBusca | null>(null);
-  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const montarUrlPagina = (pagina: number, filtros: FiltrosBusca | null) => {
     const params = new URLSearchParams();
@@ -44,22 +44,6 @@ export default function Home() {
 
   useEffect(() => {
     buscarResenhas();
-  }, []);
-
-  useEffect(() => {
-    const sentinela = sentinelaRef.current;
-    if (!sentinela) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          carregarMais();
-        }
-      },
-      { rootMargin: '300px' }
-    );
-    observer.observe(sentinela);
-    return () => observer.disconnect();
   }, []);
 
   const buscarResenhas = async () => {
@@ -132,6 +116,22 @@ export default function Home() {
     }
   };
 
+  const sentinelaRef = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+
+    if (node) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            carregarMais();
+          }
+        },
+        { rootMargin: '300px' }
+      );
+      observerRef.current.observe(node);
+    }
+  }, []);
+
   const handleCriarResenha = async () => {
     if (!isAuthenticated || !livroSelecionado || !conteudoResenha) {
       alert('Por favor, escolha um livro e escreva o conteúdo da resenha');
@@ -192,7 +192,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b border-border">
+      <header className="sticky top-0 z-20 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold text-foreground">RevBook</h1>
@@ -202,7 +202,7 @@ export default function Home() {
             <>
               <Button
                 onClick={() => setShowNewReviewModal(true)}
-                className="bg-accent text-accent-foreground hover:bg-accent/90"
+                className="btn-nova-resenha rounded-full px-6 font-semibold text-accent-foreground border-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Resenha
@@ -296,6 +296,8 @@ export default function Home() {
                     <img
                       src={resenha.capaUrl}
                       alt={resenha.titulo}
+                      loading="lazy"
+                      decoding="async"
                       className="w-16 h-24 object-cover rounded flex-shrink-0"
                     />
                   )}
@@ -373,14 +375,12 @@ export default function Home() {
         </div>
 
         {/* Infinite Scroll Sentinel */}
-        {!loading && resenhas.length > 0 && (
-          <div ref={sentinelaRef} className="py-8 text-center">
-            {carregandoMais && <p className="text-muted-foreground">Carregando mais resenhas...</p>}
-            {!temMais && !carregandoMais && (
-              <p className="text-muted-foreground text-sm">Você chegou ao fim das resenhas.</p>
-            )}
-          </div>
-        )}
+        <div ref={sentinelaRef} className={resenhas.length > 0 ? 'py-8 text-center' : ''}>
+          {carregandoMais && <p className="text-muted-foreground">Carregando mais resenhas...</p>}
+          {!loading && !temMais && !carregandoMais && resenhas.length > 0 && (
+            <p className="text-muted-foreground text-sm">Você chegou ao fim das resenhas.</p>
+          )}
+        </div>
       </main>
 
       {/* New Review Modal */}

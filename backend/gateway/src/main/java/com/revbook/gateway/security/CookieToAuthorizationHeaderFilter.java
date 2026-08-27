@@ -10,11 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-/**
- * auth-service e review-service leem o usuário logado a partir do header Authorization.
- * Como o token agora chega do navegador via cookie httpOnly, este filtro o copia para o
- * header antes de encaminhar a requisição, mantendo a validação interna dos serviços igual.
- */
 @Component
 public class CookieToAuthorizationHeaderFilter implements GlobalFilter, Ordered {
 

@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
 import Profile from "@/pages/Profile";
+import ReviewDetail from "@/pages/ReviewDetail";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
       <Route path={"/profile"} component={Profile} />
+      <Route path={"/reviews/:id"} component={ReviewDetail} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

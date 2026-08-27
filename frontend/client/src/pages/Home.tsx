@@ -3,7 +3,6 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import CommentsSection from '@/components/CommentsSection';
 import SearchBar from '@/components/SearchBar';
 import BuscaLivro from '@/components/BuscaLivro';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
@@ -18,7 +17,6 @@ export default function Home() {
   const [resenhas, setResenhas] = useState<Resenha[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewReviewModal, setShowNewReviewModal] = useState(false);
-  const [expandedResenhaId, setExpandedResenhaId] = useState<number | null>(null);
   const [livroSelecionado, setLivroSelecionado] = useState<LivroEncontrado | null>(null);
   const [conteudoResenha, setConteudoResenha] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -224,7 +222,8 @@ export default function Home() {
           {resenhas.map((resenha) => (
             <article
               key={resenha.id}
-              className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+              className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setLocation(`/reviews/${resenha.id}`)}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex gap-4">
@@ -263,14 +262,18 @@ export default function Home() {
                 </div>
                 <span className="text-sm text-muted-foreground">
                   {new Date(resenha.criadoEm).toLocaleDateString('pt-BR')}
+                  {resenha.atualizadoEm && ' (editado)'}
                 </span>
               </div>
 
-              <p className="text-foreground leading-relaxed mb-4">
+              <p className="text-foreground leading-relaxed mb-4 line-clamp-3">
                 {resenha.conteudo}
               </p>
 
-              <div className="flex justify-between items-center pt-4 border-t border-border">
+              <div
+                className="flex justify-between items-center pt-4 border-t border-border"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <AvaliacaoEstrelas
                     media={
@@ -285,29 +288,15 @@ export default function Home() {
                   <span>•</span>
                   <span>{resenha.comentarios.length} comentários</span>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() =>
-                      setExpandedResenhaId(
-                        expandedResenhaId === resenha.id ? null : resenha.id
-                      )
-                    }
-                    variant="ghost"
-                    size="sm"
-                    className="text-accent hover:text-accent/80"
-                  >
-                    {expandedResenhaId === resenha.id
-                      ? 'Ocultar Comentários'
-                      : 'Ver Comentários'}
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => setLocation(`/reviews/${resenha.id}`)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-accent hover:text-accent/80"
+                >
+                  Ver Resenha Completa
+                </Button>
               </div>
-
-              {expandedResenhaId === resenha.id && (
-                <CommentsSection
-                  resenhaId={resenha.id}
-                />
-              )}
             </article>
           ))}
         </div>
@@ -350,7 +339,9 @@ export default function Home() {
             <div className="flex gap-3 mt-6">
               <Button
                 onClick={handleCriarResenha}
-                className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
+                disabled={!livroSelecionado || !conteudoResenha.trim()}
+                className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={!livroSelecionado ? 'Selecione um livro da busca para publicar' : undefined}
               >
                 Publicar Resenha
               </Button>

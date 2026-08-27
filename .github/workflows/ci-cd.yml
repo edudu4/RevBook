@@ -1,0 +1,105 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-backend:
+    name: Testes unitários (backend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Rodar testes (auth-service, review-service, gateway)
+        working-directory: backend
+        run: mvn -B test
+
+  test-frontend:
+    name: Typecheck (frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Configurar Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Instalar dependências
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Checar tipos
+        working-directory: frontend
+        run: pnpm check
+
+  build-and-push:
+    name: Build & push das imagens Docker
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - servico: auth-service
+            contexto: backend
+            dockerfile: backend/auth-service/Dockerfile
+          - servico: review-service
+            contexto: backend
+            dockerfile: backend/review-service/Dockerfile
+          - servico: gateway
+            contexto: backend
+            dockerfile: backend/gateway/Dockerfile
+          - servico: frontend
+            contexto: frontend
+            dockerfile: frontend/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Nome do repositório em minúsculas (exigido pelo registro de imagens)
+        run: echo "REPO_OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Configurar Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push — ${{ matrix.servico }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.contexto }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER_LC }}/revbook-${{ matrix.servico }}:latest
+            ghcr.io/${{ env.REPO_OWNER_LC }}/revbook-${{ matrix.servico }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.servico }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.servico }}

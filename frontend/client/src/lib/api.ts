@@ -60,6 +60,7 @@ export interface ReviewApi {
   userName: string;
   userAvatar?: string;
   createdAt: string;
+  updatedAt?: string;
   ratings?: RatingApi[];
   comments?: CommentApi[];
 }

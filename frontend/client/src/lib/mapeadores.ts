@@ -71,6 +71,7 @@ export function paraResenha(api: ReviewApi): Resenha {
     nomeUsuario: api.userName,
     avatarUsuario: api.userAvatar,
     criadoEm: api.createdAt,
+    atualizadoEm: api.updatedAt,
     avaliacoes: (api.ratings ?? []).map((r) => ({ id: r.id, usuarioId: r.userId, valor: r.value })),
     comentarios: (api.comments ?? []).map(paraComentario),
   };

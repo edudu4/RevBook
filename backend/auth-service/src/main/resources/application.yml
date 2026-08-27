@@ -6,8 +6,8 @@ spring:
     name: auth-service
   datasource:
     url: jdbc:postgresql://localhost:5433/auth_db
-    username: revbook
-    password: revbook
+    username: ${DB_USERNAME:revbook}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,7 +21,7 @@ spring:
 
 revbook:
   jwt:
-    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
-    expiration-minutes: 60
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   google:
-    client-id: "838028623479-f78tmi9dhg21uvbq2ck5jdkp964ucts6.apps.googleusercontent.com"
+    client-id: ${GOOGLE_CLIENT_ID}

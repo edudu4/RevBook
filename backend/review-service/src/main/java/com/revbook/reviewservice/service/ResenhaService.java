@@ -3,9 +3,11 @@ package com.revbook.reviewservice.service;
 import com.revbook.reviewservice.domain.Avaliacao;
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
+import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
 import com.revbook.reviewservice.repository.ResenhaSpecifications;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.data.domain.Sort;
@@ -74,5 +76,27 @@ public class ResenhaService {
         }
 
         return avaliacaoRepository.save(avaliacao);
+    }
+
+    public Resenha atualizar(Long resenhaId, Long usuarioId, String conteudo) {
+        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId);
+        resenha.setConteudo(conteudo);
+        resenha.setAtualizadoEm(LocalDateTime.now());
+        return resenhaRepository.save(resenha);
+    }
+
+    public void excluir(Long resenhaId, Long usuarioId) {
+        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId);
+        resenhaRepository.delete(resenha);
+    }
+
+    private Resenha buscarDoUsuario(Long resenhaId, Long usuarioId) {
+        Resenha resenha = buscarPorId(resenhaId);
+
+        if (!resenha.getUsuarioId().equals(usuarioId)) {
+            throw new NaoAutorizadoException("Usuário não autorizado a alterar esta resenha");
+        }
+
+        return resenha;
     }
 }

@@ -202,7 +202,7 @@ export default function Profile() {
                       {resenha.avaliacoes.length} avaliações
                     </span>
                     <Button
-                      onClick={() => setLocation('/')}
+                      onClick={() => setLocation(`/reviews/${resenha.id}`)}
                       variant="ghost"
                       size="sm"
                       className="text-accent hover:text-accent/80"
@@ -250,7 +250,7 @@ export default function Profile() {
                   </p>
 
                   <Button
-                    onClick={() => setLocation('/')}
+                    onClick={() => setLocation(`/reviews/${comentario.resenha.id}`)}
                     variant="ghost"
                     size="sm"
                     className="text-accent hover:text-accent/80"

@@ -44,5 +44,5 @@ spring:
 
 revbook:
   jwt:
-    # Chave HMAC compartilhada com auth-service e review-service (mesmo valor nos 3 application.yml).
-    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
+    # Chave HMAC compartilhada com auth-service e review-service (mesma variável JWT_SECRET nos 3 serviços).
+    secret: ${JWT_SECRET}

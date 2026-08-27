@@ -6,8 +6,8 @@ spring:
     name: review-service
   datasource:
     url: jdbc:postgresql://localhost:5433/review_db
-    username: revbook
-    password: revbook
+    username: ${DB_USERNAME:revbook}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,7 +21,7 @@ spring:
 
 revbook:
   jwt:
-    secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
+    secret: ${JWT_SECRET}
   google-books:
     # Opcional — sem chave a Google Books API funciona com uma cota bem menor por IP.
     # Gere uma em https://console.cloud.google.com/apis/credentials habilitando a "Books API".

@@ -3,14 +3,17 @@ package com.revbook.reviewservice.controller;
 import com.revbook.reviewservice.dto.CreateReviewRequest;
 import com.revbook.reviewservice.dto.RateReviewRequest;
 import com.revbook.reviewservice.dto.ReviewResponse;
+import com.revbook.reviewservice.dto.UpdateReviewRequest;
 import com.revbook.reviewservice.security.UsuarioAutenticado;
 import com.revbook.reviewservice.security.UsuarioLogado;
 import com.revbook.reviewservice.service.LivroService;
 import com.revbook.reviewservice.service.ResenhaService;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,5 +72,18 @@ public class ResenhaController {
     @PostMapping("/reviews/rate")
     public void avaliar(@RequestBody RateReviewRequest dados, @UsuarioLogado UsuarioAutenticado usuario) {
         resenhaService.avaliar(dados.reviewId(), usuario.id(), dados.value());
+    }
+
+    @PutMapping("/reviews/{id}")
+    public ReviewResponse atualizar(
+            @PathVariable Long id,
+            @RequestBody UpdateReviewRequest dados,
+            @UsuarioLogado UsuarioAutenticado usuario) {
+        return ReviewResponse.de(resenhaService.atualizar(id, usuario.id(), dados.content()));
+    }
+
+    @DeleteMapping("/reviews/{id}")
+    public void excluir(@PathVariable Long id, @UsuarioLogado UsuarioAutenticado usuario) {
+        resenhaService.excluir(id, usuario.id());
     }
 }

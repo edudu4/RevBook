@@ -38,6 +38,8 @@ public class Resenha {
     @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm = LocalDateTime.now();
 
+    private LocalDateTime atualizadoEm;
+
     @OneToMany(mappedBy = "resenha", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Avaliacao> avaliacoes = new ArrayList<>();
 
@@ -67,6 +69,10 @@ public class Resenha {
         return conteudo;
     }
 
+    public void setConteudo(String conteudo) {
+        this.conteudo = conteudo;
+    }
+
     public Long getUsuarioId() {
         return usuarioId;
     }
@@ -81,6 +87,14 @@ public class Resenha {
 
     public LocalDateTime getCriadoEm() {
         return criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 
     public List<Avaliacao> getAvaliacoes() {

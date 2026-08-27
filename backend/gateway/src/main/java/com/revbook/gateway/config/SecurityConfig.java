@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/reviews", "/reviews/rate").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/reviews/*").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/reviews/*").authenticated()
                         .pathMatchers(HttpMethod.POST, "/reviews/*/comments").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/comments/*").authenticated()
                         .pathMatchers(HttpMethod.PUT, "/comments/*").authenticated()

@@ -10,21 +10,21 @@ public final class ResenhaSpecifications {
     private ResenhaSpecifications() {
     }
 
-    public static Specification<Resenha> comFiltros(String titulo, String autor, String genero) {
+    public static Specification<Resenha> comFiltros(String termo, String genero) {
         return (root, query, cb) -> {
             var predicado = cb.conjunction();
 
-            if (!StringUtils.hasText(titulo) && !StringUtils.hasText(autor) && !StringUtils.hasText(genero)) {
+            if (!StringUtils.hasText(termo) && !StringUtils.hasText(genero)) {
                 return predicado;
             }
 
             var livro = root.<Resenha, Livro>join("livro");
 
-            if (StringUtils.hasText(titulo)) {
-                predicado = cb.and(predicado, cb.like(cb.lower(livro.get("titulo")), "%" + titulo.toLowerCase() + "%"));
-            }
-            if (StringUtils.hasText(autor)) {
-                predicado = cb.and(predicado, cb.like(cb.lower(livro.get("autor")), "%" + autor.toLowerCase() + "%"));
+            if (StringUtils.hasText(termo)) {
+                String padrao = "%" + termo.toLowerCase() + "%";
+                predicado = cb.and(
+                        predicado,
+                        cb.or(cb.like(cb.lower(livro.get("titulo")), padrao), cb.like(cb.lower(livro.get("autor")), padrao)));
             }
             if (StringUtils.hasText(genero)) {
                 predicado = cb.and(predicado, cb.like(cb.lower(livro.get("genero")), "%" + genero.toLowerCase() + "%"));

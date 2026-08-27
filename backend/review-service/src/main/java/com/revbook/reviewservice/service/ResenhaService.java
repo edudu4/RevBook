@@ -60,10 +60,9 @@ public class ResenhaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Resenha> buscar(String titulo, String autor, String genero, int pagina, int tamanho) {
+    public List<Resenha> buscar(String termo, String genero, int pagina, int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "criadoEm"));
-        return resenhaRepository.findAll(ResenhaSpecifications.comFiltros(titulo, autor, genero), pageable)
-                .getContent();
+        return resenhaRepository.findAll(ResenhaSpecifications.comFiltros(termo, genero), pageable).getContent();
     }
 
     public Avaliacao avaliar(

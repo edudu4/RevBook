@@ -44,14 +44,11 @@ public class ResenhaController {
 
     @GetMapping("/reviews/search")
     public List<ReviewResponse> buscar(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String q,
             @RequestParam(required = false) String genre,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return resenhaService.buscar(title, author, genre, page, size).stream()
-                .map(ReviewResponse::de)
-                .toList();
+        return resenhaService.buscar(q, genre, page, size).stream().map(ReviewResponse::de).toList();
     }
 
     @GetMapping("/genres")

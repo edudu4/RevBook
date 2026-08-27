@@ -31,6 +31,10 @@ spring:
           uri: http://localhost:8878
           predicates:
             - Path=/users/**
+        - id: review-service-books
+          uri: http://localhost:8878
+          predicates:
+            - Path=/books/**
       globalcors:
         cors-configurations:
           "[/**]":

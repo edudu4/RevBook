@@ -5,6 +5,7 @@ import com.revbook.reviewservice.dto.RateReviewRequest;
 import com.revbook.reviewservice.dto.ReviewResponse;
 import com.revbook.reviewservice.security.UsuarioAutenticado;
 import com.revbook.reviewservice.security.UsuarioLogado;
+import com.revbook.reviewservice.service.LivroService;
 import com.revbook.reviewservice.service.ResenhaService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,15 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResenhaController {
 
     private final ResenhaService resenhaService;
+    private final LivroService livroService;
 
-    public ResenhaController(ResenhaService resenhaService) {
+    public ResenhaController(ResenhaService resenhaService, LivroService livroService) {
         this.resenhaService = resenhaService;
+        this.livroService = livroService;
     }
 
     @PostMapping("/reviews")
     public ReviewResponse criar(@RequestBody CreateReviewRequest dados, @UsuarioLogado UsuarioAutenticado usuario) {
         var resenha = resenhaService.criar(
-                dados.bookTitle(), dados.author(), dados.genre(), dados.content(), usuario.id(), usuario.nome());
+                dados.googleBooksId(), dados.bookTitle(), dados.author(), dados.genre(), dados.coverUrl(),
+                dados.content(), usuario.id(), usuario.nome());
         return ReviewResponse.de(resenha);
     }
 
@@ -49,7 +53,7 @@ public class ResenhaController {
 
     @GetMapping("/genres")
     public List<String> listarGeneros() {
-        return resenhaService.listarGeneros();
+        return livroService.listarGeneros();
     }
 
     @GetMapping("/reviews/{id}")

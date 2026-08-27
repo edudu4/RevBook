@@ -4,6 +4,7 @@
  * resposta cumprem no Gateway em Spring.
  */
 import type {
+  BookSearchResultApi,
   CommentApi,
   CommentWithReviewApi,
   ReactionApi,
@@ -15,6 +16,7 @@ import type {
   Comentario,
   ComentarioComResenha,
   EstatisticasUsuario,
+  LivroEncontrado,
   Reacao,
   Resenha,
   Usuario,
@@ -63,12 +65,23 @@ export function paraResenha(api: ReviewApi): Resenha {
     titulo: api.bookTitle,
     autor: api.author,
     genero: api.genre,
+    capaUrl: api.coverUrl,
     conteudo: api.content,
     usuarioId: api.userId,
     nomeUsuario: api.userName,
     criadoEm: api.createdAt,
     avaliacoes: (api.ratings ?? []).map((r) => ({ id: r.id, usuarioId: r.userId, valor: r.value })),
     comentarios: (api.comments ?? []).map(paraComentario),
+  };
+}
+
+export function paraLivroEncontrado(api: BookSearchResultApi): LivroEncontrado {
+  return {
+    googleBooksId: api.googleBooksId,
+    titulo: api.title,
+    autor: api.author,
+    genero: api.genre,
+    capaUrl: api.coverUrl,
   };
 }
 

@@ -47,12 +47,22 @@ export interface Resenha {
   titulo: string;
   autor: string;
   genero?: string;
+  capaUrl?: string;
   conteudo: string;
   usuarioId: number;
   nomeUsuario: string;
   criadoEm: string;
   avaliacoes: Avaliacao[];
   comentarios: Comentario[];
+}
+
+/** Um resultado de busca na Google Books — ainda não é necessariamente uma Resenha. */
+export interface LivroEncontrado {
+  googleBooksId: string;
+  titulo: string;
+  autor: string;
+  genero?: string;
+  capaUrl?: string;
 }
 
 export interface EstatisticasUsuario {

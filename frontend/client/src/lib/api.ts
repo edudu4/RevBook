@@ -54,12 +54,30 @@ export interface ReviewApi {
   bookTitle: string;
   author: string;
   genre?: string;
+  coverUrl?: string;
   content: string;
   userId: number;
   userName: string;
   createdAt: string;
   ratings?: RatingApi[];
   comments?: CommentApi[];
+}
+
+export interface BookSearchResultApi {
+  googleBooksId: string;
+  title: string;
+  author: string;
+  genre?: string;
+  coverUrl?: string;
+}
+
+export interface CreateReviewApiRequest {
+  googleBooksId: string;
+  bookTitle: string;
+  author: string;
+  genre?: string;
+  coverUrl?: string;
+  content: string;
 }
 
 export interface UserStatsApi {

@@ -10,6 +10,7 @@ public record ReviewResponse(
         String bookTitle,
         String author,
         String genre,
+        String coverUrl,
         String content,
         Long userId,
         String userName,
@@ -18,11 +19,13 @@ public record ReviewResponse(
         List<CommentResponse> comments) {
 
     public static ReviewResponse de(Resenha resenha) {
+        var livro = resenha.getLivro();
         return new ReviewResponse(
                 resenha.getId(),
-                resenha.getTitulo(),
-                resenha.getAutor(),
-                resenha.getGenero(),
+                livro.getTitulo(),
+                livro.getAutor(),
+                livro.getGenero(),
+                livro.getCapaUrl(),
                 resenha.getConteudo(),
                 resenha.getUsuarioId(),
                 resenha.getNomeUsuario(),

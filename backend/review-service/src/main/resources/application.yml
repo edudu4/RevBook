@@ -22,3 +22,7 @@ spring:
 revbook:
   jwt:
     secret: "troque-esta-chave-secreta-em-producao-revbook-tcc-2026"
+  google-books:
+    # Opcional — sem chave a Google Books API funciona com uma cota bem menor por IP.
+    # Gere uma em https://console.cloud.google.com/apis/credentials habilitando a "Books API".
+    api-key: ${GOOGLE_BOOKS}

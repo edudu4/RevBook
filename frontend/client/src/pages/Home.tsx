@@ -4,10 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import CommentsSection from '@/components/CommentsSection';
 import SearchBar from '@/components/SearchBar';
+import BuscaLivro from '@/components/BuscaLivro';
 import { Star, LogOut, Plus } from 'lucide-react';
-import { API_BASE_URL, type ReviewApi } from '@/lib/api';
+import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib/api';
 import { paraResenha } from '@/lib/mapeadores';
-import type { FiltrosBusca, Resenha } from '@/types/dominio';
+import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -16,12 +17,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showNewReviewModal, setShowNewReviewModal] = useState(false);
   const [expandedResenhaId, setExpandedResenhaId] = useState<number | null>(null);
-  const [novaResenha, setNovaResenha] = useState({
-    titulo: '',
-    autor: '',
-    genero: '',
-    conteudo: '',
-  });
+  const [livroSelecionado, setLivroSelecionado] = useState<LivroEncontrado | null>(null);
+  const [conteudoResenha, setConteudoResenha] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -71,28 +68,33 @@ export default function Home() {
   };
 
   const handleCriarResenha = async () => {
-    if (!token || !novaResenha.titulo || !novaResenha.autor || !novaResenha.conteudo) {
-      alert('Por favor, preencha os campos obrigatórios (título, autor e conteúdo)');
+    if (!token || !livroSelecionado || !conteudoResenha) {
+      alert('Por favor, escolha um livro e escreva o conteúdo da resenha');
       return;
     }
 
     try {
+      const corpo: CreateReviewApiRequest = {
+        googleBooksId: livroSelecionado.googleBooksId,
+        bookTitle: livroSelecionado.titulo,
+        author: livroSelecionado.autor,
+        genre: livroSelecionado.genero,
+        coverUrl: livroSelecionado.capaUrl,
+        content: conteudoResenha,
+      };
+
       const response = await fetch(`${API_BASE_URL}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          bookTitle: novaResenha.titulo,
-          author: novaResenha.autor,
-          genre: novaResenha.genero,
-          content: novaResenha.conteudo,
-        }),
+        body: JSON.stringify(corpo),
       });
 
       if (response.ok) {
-        setNovaResenha({ titulo: '', autor: '', genero: '', conteudo: '' });
+        setLivroSelecionado(null);
+        setConteudoResenha('');
         setShowNewReviewModal(false);
         buscarResenhas();
       }
@@ -219,20 +221,29 @@ export default function Home() {
               className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground mb-1">
-                    {resenha.titulo}
-                  </h2>
-                  <div className="flex items-center gap-4 text-muted-foreground">
-                    <span>por {resenha.autor}</span>
-                    {resenha.genero && (
-                      <>
-                        <span>•</span>
-                        <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">
-                          {resenha.genero}
-                        </span>
-                      </>
-                    )}
+                <div className="flex gap-4">
+                  {resenha.capaUrl && (
+                    <img
+                      src={resenha.capaUrl}
+                      alt={resenha.titulo}
+                      className="w-16 h-24 object-cover rounded flex-shrink-0"
+                    />
+                  )}
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground mb-1">
+                      {resenha.titulo}
+                    </h2>
+                    <div className="flex items-center gap-4 text-muted-foreground">
+                      <span>por {resenha.autor}</span>
+                      {resenha.genero && (
+                        <>
+                          <span>•</span>
+                          <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">
+                            {resenha.genero}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -300,46 +311,12 @@ export default function Home() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Título do Livro *
+                  Livro *
                 </label>
-                <input
-                  type="text"
-                  value={novaResenha.titulo}
-                  onChange={(e) =>
-                    setNovaResenha({ ...novaResenha, titulo: e.target.value })
-                  }
-                  placeholder="Digite o título..."
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Autor *
-                </label>
-                <input
-                  type="text"
-                  value={novaResenha.autor}
-                  onChange={(e) =>
-                    setNovaResenha({ ...novaResenha, autor: e.target.value })
-                  }
-                  placeholder="Digite o nome do autor..."
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Gênero (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={novaResenha.genero}
-                  onChange={(e) =>
-                    setNovaResenha({ ...novaResenha, genero: e.target.value })
-                  }
-                  placeholder="Ex: Ficção Científica, Romance, Mistério..."
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                <BuscaLivro
+                  livroSelecionado={livroSelecionado}
+                  onSelecionar={setLivroSelecionado}
+                  onLimpar={() => setLivroSelecionado(null)}
                 />
               </div>
 
@@ -348,10 +325,8 @@ export default function Home() {
                   Resenha *
                 </label>
                 <textarea
-                  value={novaResenha.conteudo}
-                  onChange={(e) =>
-                    setNovaResenha({ ...novaResenha, conteudo: e.target.value })
-                  }
+                  value={conteudoResenha}
+                  onChange={(e) => setConteudoResenha(e.target.value)}
                   placeholder="Escreva sua resenha..."
                   rows={6}
                   className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
@@ -367,7 +342,11 @@ export default function Home() {
                 Publicar Resenha
               </Button>
               <Button
-                onClick={() => setShowNewReviewModal(false)}
+                onClick={() => {
+                  setShowNewReviewModal(false);
+                  setLivroSelecionado(null);
+                  setConteudoResenha('');
+                }}
                 variant="outline"
                 className="flex-1"
               >

@@ -1,11 +1,11 @@
 package com.revbook.reviewservice.service;
 
 import com.revbook.reviewservice.domain.Avaliacao;
+import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
 import com.revbook.reviewservice.repository.ResenhaSpecifications;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.data.domain.Sort;
@@ -18,14 +18,20 @@ public class ResenhaService {
 
     private final ResenhaRepository resenhaRepository;
     private final AvaliacaoRepository avaliacaoRepository;
+    private final LivroService livroService;
 
-    public ResenhaService(ResenhaRepository resenhaRepository, AvaliacaoRepository avaliacaoRepository) {
+    public ResenhaService(
+            ResenhaRepository resenhaRepository, AvaliacaoRepository avaliacaoRepository, LivroService livroService) {
         this.resenhaRepository = resenhaRepository;
         this.avaliacaoRepository = avaliacaoRepository;
+        this.livroService = livroService;
     }
 
-    public Resenha criar(String titulo, String autor, String genero, String conteudo, Long usuarioId, String nomeUsuario) {
-        Resenha resenha = new Resenha(titulo, autor, genero, conteudo, usuarioId, nomeUsuario);
+    public Resenha criar(
+            String googleBooksId, String titulo, String autor, String genero, String capaUrl,
+            String conteudo, Long usuarioId, String nomeUsuario) {
+        Livro livro = livroService.buscarOuCriar(googleBooksId, titulo, autor, genero, capaUrl);
+        Resenha resenha = new Resenha(livro, conteudo, usuarioId, nomeUsuario);
         return resenhaRepository.save(resenha);
     }
 
@@ -50,16 +56,6 @@ public class ResenhaService {
         return resenhaRepository.findAll(
                 ResenhaSpecifications.comFiltros(titulo, autor, genero),
                 Sort.by(Sort.Direction.DESC, "criadoEm"));
-    }
-
-    @Transactional(readOnly = true)
-    public List<String> listarGeneros() {
-        return resenhaRepository.findAll().stream()
-                .map(Resenha::getGenero)
-                .filter(genero -> genero != null && !genero.isBlank())
-                .distinct()
-                .sorted(Comparator.naturalOrder())
-                .toList();
     }
 
     public Avaliacao avaliar(Long resenhaId, Long usuarioId, Integer valor) {

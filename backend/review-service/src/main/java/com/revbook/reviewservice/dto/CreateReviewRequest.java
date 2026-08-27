@@ -1,4 +1,11 @@
 package com.revbook.reviewservice.dto;
 
-public record CreateReviewRequest(String bookTitle, String author, String genre, String content) {
+/** O livro vem escolhido de um resultado de busca (GET /books/search) — sem digitação livre. */
+public record CreateReviewRequest(
+        String googleBooksId,
+        String bookTitle,
+        String author,
+        String genre,
+        String coverUrl,
+        String content) {
 }

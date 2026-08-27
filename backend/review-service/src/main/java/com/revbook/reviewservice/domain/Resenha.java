@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,13 +20,9 @@ public class Resenha {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String titulo;
-
-    @Column(nullable = false)
-    private String autor;
-
-    private String genero;
+    @ManyToOne
+    @JoinColumn(name = "livro_id", nullable = false)
+    private Livro livro;
 
     @Column(columnDefinition = "text", nullable = false)
     private String conteudo;
@@ -47,10 +45,8 @@ public class Resenha {
     protected Resenha() {
     }
 
-    public Resenha(String titulo, String autor, String genero, String conteudo, Long usuarioId, String nomeUsuario) {
-        this.titulo = titulo;
-        this.autor = autor;
-        this.genero = genero;
+    public Resenha(Livro livro, String conteudo, Long usuarioId, String nomeUsuario) {
+        this.livro = livro;
         this.conteudo = conteudo;
         this.usuarioId = usuarioId;
         this.nomeUsuario = nomeUsuario;
@@ -60,16 +56,8 @@ public class Resenha {
         return id;
     }
 
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public String getAutor() {
-        return autor;
-    }
-
-    public String getGenero() {
-        return genero;
+    public Livro getLivro() {
+        return livro;
     }
 
     public String getConteudo() {

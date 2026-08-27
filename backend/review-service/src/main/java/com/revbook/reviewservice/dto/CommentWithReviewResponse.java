@@ -26,7 +26,8 @@ public record CommentWithReviewResponse(
                 comentario.getCriadoEm(),
                 comentario.getAtualizadoEm(),
                 ReactionResponse.agrupar(comentario.getReacoes()),
-                new ReviewSummaryResponse(comentario.getResenha().getId(), comentario.getResenha().getTitulo()));
+                new ReviewSummaryResponse(
+                        comentario.getResenha().getId(), comentario.getResenha().getLivro().getTitulo()));
     }
 
     public record ReviewSummaryResponse(Long id, String bookTitle) {

@@ -173,15 +173,15 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
             <div key={comentario.id} className="p-4 bg-card border border-border rounded-lg">
               <div className="flex justify-between items-start mb-2">
                 <div
-                  className="flex items-center gap-3 w-fit hover:opacity-80"
+                  className="flex items-center gap-3 min-w-0 hover:opacity-80"
                   onClick={() => setLocation(`/users/${comentario.usuarioId}`)}
                 >
-                  <Avatar>
+                  <Avatar className="flex-shrink-0">
                     <AvatarImage src={comentario.avatarUsuario} alt={comentario.nomeUsuario} />
                     <AvatarFallback>{comentario.nomeUsuario.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-semibold text-foreground">{comentario.nomeUsuario}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground truncate">{comentario.nomeUsuario}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(comentario.criadoEm).toLocaleDateString('pt-BR')}
                       {comentario.atualizadoEm && ' (editado)'}

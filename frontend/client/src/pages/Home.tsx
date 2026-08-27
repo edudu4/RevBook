@@ -3,12 +3,15 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Footer from '@/components/Footer';
+import Spinner from '@/components/Spinner';
 import SearchBar from '@/components/SearchBar';
 import BuscaLivro from '@/components/BuscaLivro';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
 import { LogOut, Plus } from 'lucide-react';
 import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib/api';
 import { paraResenha } from '@/lib/mapeadores';
+import { preloadImagens } from '@/lib/preloadImagens';
 import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
 
 const TAMANHO_PAGINA = 10;
@@ -54,6 +57,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas(mapeadas);
         paginaRef.current = 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -76,6 +80,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas(mapeadas);
         paginaRef.current = 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -103,6 +108,7 @@ export default function Home() {
       if (response.ok) {
         const data: ReviewApi[] = await response.json();
         const mapeadas = data.map(paraResenha);
+        await preloadImagens(mapeadas.flatMap((r) => [r.capaUrl, r.avatarUsuario]));
         setResenhas((atual) => [...atual, ...mapeadas]);
         paginaRef.current += 1;
         temMaisRef.current = mapeadas.length === TAMANHO_PAGINA;
@@ -190,35 +196,35 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex flex-wrap gap-y-3 justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <span
-              className="flex items-center justify-center w-9 h-9 rounded-md font-bold text-lg flex-shrink-0"
+              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-md font-bold text-base sm:text-lg flex-shrink-0"
               style={{ backgroundColor: '#542229', color: '#D5A62A' }}
               aria-hidden="true"
             >
               R
             </span>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground leading-tight">RevBook</h1>
-              <p className="text-xs text-muted-foreground">Resenhas de livros, por quem lê de verdade.</p>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight truncate">RevBook</h1>
+              <p className="hidden sm:block text-xs text-muted-foreground">Resenhas de livros, por quem lê de verdade.</p>
             </div>
           </div>
 
           {isAuthenticated ? (
-            <>
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 onClick={() => setShowNewReviewModal(true)}
-                className="btn-nova-resenha rounded-full px-6 font-semibold text-accent-foreground border-0"
+                className="btn-nova-resenha rounded-full px-3 sm:px-6 font-semibold text-accent-foreground border-0"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Nova Resenha
+                <Plus className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Nova Resenha</span>
               </Button>
-              <div className="flex items-center gap-3 border-l border-border pl-4">
-                <span className="text-sm text-muted-foreground">{user?.nome}</span>
+              <div className="flex items-center gap-2 sm:gap-3 border-l border-border pl-2 sm:pl-4">
+                <span className="hidden sm:inline text-sm text-muted-foreground">{user?.nome}</span>
                 <Button
                   onClick={() => setLocation('/profile')}
                   variant="ghost"
@@ -242,7 +248,7 @@ export default function Home() {
                   <LogOut className="w-4 h-4" />
                 </Button>
               </div>
-            </>
+            </div>
           ) : (
             <Button
               onClick={() => setLocation('/login')}
@@ -255,7 +261,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12">
         {/* Search Bar */}
         <SearchBar onSearch={handleBuscar} onClear={handleLimparBusca} />
 
@@ -269,11 +275,7 @@ export default function Home() {
         )}
 
         {/* Loading State */}
-        {loading && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Carregando resenhas...</p>
-          </div>
-        )}
+        {loading && <Spinner label="Carregando resenhas..." />}
 
         {/* Empty State */}
         {!loading && resenhas.length === 0 && (
@@ -297,11 +299,11 @@ export default function Home() {
           {resenhas.map((resenha) => (
             <article
               key={resenha.id}
-              className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => setLocation(`/reviews/${resenha.id}`)}
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-4">
+                <div className="flex gap-4 min-w-0">
                   {resenha.capaUrl && (
                     <img
                       src={resenha.capaUrl}
@@ -311,19 +313,16 @@ export default function Home() {
                       className="w-16 h-24 object-cover rounded flex-shrink-0"
                     />
                   )}
-                  <div>
-                    <h2 className="text-2xl font-bold text-foreground mb-1">
+                  <div className="min-w-0">
+                    <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-1">
                       {resenha.titulo}
                     </h2>
-                    <div className="flex items-center gap-4 text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-muted-foreground">
                       <span>por {resenha.autor}</span>
                       {resenha.genero && (
-                        <>
-                          <span>•</span>
-                          <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">
-                            {resenha.genero}
-                          </span>
-                        </>
+                        <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">
+                          {resenha.genero}
+                        </span>
                       )}
                     </div>
                     <div
@@ -343,7 +342,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground flex-shrink-0">
                   {new Date(resenha.criadoEm).toLocaleDateString('pt-BR')}
                   {resenha.atualizadoEm && ' (editado)'}
                 </span>
@@ -354,10 +353,10 @@ export default function Home() {
               </p>
 
               <div
-                className="flex justify-between items-center pt-4 border-t border-border"
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-4 border-t border-border"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
                   <AvaliacaoEstrelas
                     media={
                       resenha.avaliacoes.length
@@ -368,14 +367,13 @@ export default function Home() {
                     interativo={isAuthenticated}
                     onAvaliar={(valor) => handleAvaliarResenha(resenha.id, valor)}
                   />
-                  <span>•</span>
                   <span>{resenha.comentarios.length} comentários</span>
                 </div>
                 <Button
                   onClick={() => setLocation(`/reviews/${resenha.id}`)}
                   variant="ghost"
                   size="sm"
-                  className="text-accent hover:text-accent/80"
+                  className="text-accent hover:text-accent/80 self-start sm:self-auto"
                 >
                   Ver Resenha Completa
                 </Button>
@@ -386,17 +384,19 @@ export default function Home() {
 
         {/* Infinite Scroll Sentinel */}
         <div ref={sentinelaRef} className={resenhas.length > 0 ? 'py-8 text-center' : ''}>
-          {carregandoMais && <p className="text-muted-foreground">Carregando mais resenhas...</p>}
+          {carregandoMais && <Spinner label="Carregando mais resenhas..." tamanho="pequeno" />}
           {!loading && !temMais && !carregandoMais && resenhas.length > 0 && (
             <p className="text-muted-foreground text-sm">Você chegou ao fim das resenhas.</p>
           )}
         </div>
       </main>
 
+      <Footer />
+
       {/* New Review Modal */}
       {showNewReviewModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg p-8 max-w-2xl w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Criar Nova Resenha
             </h2>

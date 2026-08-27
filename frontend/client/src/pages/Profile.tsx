@@ -3,9 +3,12 @@ import { useLocation, useRoute } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Footer from '@/components/Footer';
+import Spinner from '@/components/Spinner';
 import { ArrowLeft, BookOpen, MessageSquare, Award } from 'lucide-react';
 import { API_BASE_URL, type CommentWithReviewApi, type ReviewApi, type UserStatsApi } from '@/lib/api';
 import { paraComentarioComResenha, paraEstatisticas, paraResenha } from '@/lib/mapeadores';
+import { preloadImagens } from '@/lib/preloadImagens';
 import type { ComentarioComResenha, EstatisticasUsuario, Resenha } from '@/types/dominio';
 
 export default function Profile() {
@@ -37,9 +40,12 @@ export default function Profile() {
       setLoading(true);
 
       const statsResponse = await fetch(`${API_BASE_URL}/users/${id}/profile`);
+      let avatarCarregado: string | undefined;
       if (statsResponse.ok) {
         const statsData: UserStatsApi = await statsResponse.json();
-        setEstatisticas(paraEstatisticas(statsData));
+        const stats = paraEstatisticas(statsData);
+        avatarCarregado = stats.avatarUsuario;
+        setEstatisticas(stats);
       }
 
       const resenhasResponse = await fetch(`${API_BASE_URL}/users/${id}/reviews`);
@@ -53,6 +59,8 @@ export default function Profile() {
         const comentariosData: CommentWithReviewApi[] = await comentariosResponse.json();
         setComentarios(comentariosData.map(paraComentarioComResenha));
       }
+
+      await preloadImagens([user?.avatar, avatarCarregado]);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
@@ -64,18 +72,14 @@ export default function Profile() {
   const avatarExibido = ehProprioPerfil ? user?.avatar : estatisticas?.avatarUsuario;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Carregando perfil...</p>
-      </div>
-    );
+    return <Spinner label="Carregando perfil..." telaCheia />;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex items-center gap-3 sm:gap-4">
           <Button
             onClick={() => setLocation('/')}
             variant="ghost"
@@ -83,53 +87,53 @@ export default function Profile() {
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-xl sm:text-3xl font-bold text-foreground min-w-0 truncate">
             {ehProprioPerfil ? 'Meu Perfil' : `Perfil de ${nomeExibido ?? '...'}`}
           </h1>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12">
         {/* Profile Header */}
-        <div className="bg-card border border-border rounded-lg p-8 mb-8">
-          <div className="flex items-center gap-6 mb-8">
-            <Avatar className="size-24">
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-4 sm:gap-6 mb-8">
+            <Avatar className="size-16 sm:size-24">
               <AvatarImage src={avatarExibido} alt={nomeExibido} />
-              <AvatarFallback className="text-4xl font-bold">
+              <AvatarFallback className="text-2xl sm:text-4xl font-bold">
                 {nomeExibido?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">{nomeExibido}</h2>
-              {ehProprioPerfil && <p className="text-muted-foreground">{user?.email}</p>}
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-3xl font-bold text-foreground mb-2 truncate">{nomeExibido}</h2>
+              {ehProprioPerfil && <p className="text-muted-foreground truncate">{user?.email}</p>}
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-muted rounded-lg p-4 text-center">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="bg-muted rounded-lg p-3 sm:p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <BookOpen className="w-5 h-5 text-accent" />
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-lg sm:text-2xl font-bold text-foreground">
                   {estatisticas?.totalResenhas || 0}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">Resenhas</p>
             </div>
-            <div className="bg-muted rounded-lg p-4 text-center">
+            <div className="bg-muted rounded-lg p-3 sm:p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <MessageSquare className="w-5 h-5 text-accent" />
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-lg sm:text-2xl font-bold text-foreground">
                   {estatisticas?.totalComentarios || 0}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">Comentários</p>
             </div>
-            <div className="bg-muted rounded-lg p-4 text-center">
+            <div className="bg-muted rounded-lg p-3 sm:p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Award className="w-5 h-5 text-accent" />
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-lg sm:text-2xl font-bold text-foreground">
                   {estatisticas?.totalAvaliacoesRecebidas || 0}
                 </span>
               </div>
@@ -190,16 +194,16 @@ export default function Profile() {
               resenhas.map((resenha) => (
                 <article
                   key={resenha.id}
-                  className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                  className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-2xl font-bold text-foreground mb-1">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 mb-4">
+                    <div className="min-w-0">
+                      <h3 className="text-lg sm:text-2xl font-bold text-foreground mb-1">
                         {resenha.titulo}
                       </h3>
                       <p className="text-muted-foreground">por {resenha.autor}</p>
                     </div>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-muted-foreground flex-shrink-0">
                       {new Date(resenha.criadoEm).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
@@ -208,7 +212,7 @@ export default function Profile() {
                     {resenha.conteudo}
                   </p>
 
-                  <div className="flex justify-between items-center pt-4 border-t border-border">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-4 border-t border-border">
                     <span className="text-sm text-muted-foreground">
                       {resenha.avaliacoes.length} avaliações
                     </span>
@@ -244,7 +248,7 @@ export default function Profile() {
               comentarios.map((comentario) => (
                 <div
                   key={comentario.id}
-                  className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                  className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="mb-4">
                     <p className="text-sm text-muted-foreground mb-2">
@@ -276,6 +280,8 @@ export default function Profile() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -195,7 +195,17 @@ export default function Home() {
       <header className="sticky top-0 z-20 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-foreground">RevBook</h1>
+            <span
+              className="flex items-center justify-center w-9 h-9 rounded-md font-bold text-lg flex-shrink-0"
+              style={{ backgroundColor: '#542229', color: '#D5A62A' }}
+              aria-hidden="true"
+            >
+              R
+            </span>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground leading-tight">RevBook</h1>
+              <p className="text-xs text-muted-foreground">Resenhas de livros, por quem lê de verdade.</p>
+            </div>
           </div>
 
           {isAuthenticated ? (

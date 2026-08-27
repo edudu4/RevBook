@@ -50,7 +50,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Verificação server-side do ID token do Google (assinatura, audience, expiração). -->
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client</artifactId>

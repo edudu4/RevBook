@@ -97,8 +97,12 @@ public class GoogleBooksClient {
         String genero = info.categories() != null && !info.categories().isEmpty()
                 ? info.categories().get(0)
                 : null;
-        String capaUrl = info.imageLinks() != null ? info.imageLinks().thumbnail() : null;
+        String capaUrl = info.imageLinks() != null ? paraHttps(info.imageLinks().thumbnail()) : null;
 
         return Optional.of(new LivroEncontrado(item.id(), info.title(), autor, genero, capaUrl));
+    }
+
+    private String paraHttps(String url) {
+        return url != null ? url.replaceFirst("^http://", "https://") : null;
     }
 }

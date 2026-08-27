@@ -26,7 +26,5 @@ revbook:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
   cookie:
-    # Vazio (host-only) em dev local; ".revbook.com.br" em produção, para o cookie valer
-    # tanto em revbook.com.br quanto em api.revbook.com.br.
     domain: ${COOKIE_DOMAIN:}
     secure: ${COOKIE_SECURE:false}

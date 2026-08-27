@@ -30,13 +30,11 @@
   </dependencyManagement>
 
   <dependencies>
-    <!-- Spring Cloud Gateway: roteamento reativo pronto (WebFlux), sem proxy manual. -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-gateway</artifactId>
     </dependency>
 
-    <!-- Segurança reativa + validação de JWT via OAuth2 Resource Server (decoder padrão do Spring). -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>

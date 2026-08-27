@@ -1,5 +1,3 @@
-# Build a partir da raiz de backend/ (contexto = backend/), pois este módulo
-# herda do POM pai do reactor multi-módulo.
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 COPY . .

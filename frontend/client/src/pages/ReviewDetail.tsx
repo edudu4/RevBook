@@ -150,6 +150,7 @@ export default function ReviewDetail() {
               <img
                 src={resenha.capaUrl}
                 alt={resenha.titulo}
+                decoding="async"
                 className="w-24 h-36 object-cover rounded flex-shrink-0"
               />
             )}

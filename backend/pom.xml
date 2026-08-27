@@ -38,11 +38,6 @@
 
   <build>
     <plugins>
-      <!-- Declarado direto em <plugins> (não <pluginManagement>) para ser
-           herdado e executado pelos módulos filhos automaticamente. Sem isto,
-           o Spring MVC não consegue resolver os nomes de @PathVariable/
-           @RequestParam via reflection (este POM não herda de
-           spring-boot-starter-parent, que configura isso por padrão). -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -53,11 +48,6 @@
     </plugins>
     <pluginManagement>
       <plugins>
-        <!-- Sem herdar de spring-boot-starter-parent, o goal "repackage" não é
-             ligado à fase "package" automaticamente — sem isto, "mvn package"
-             gera um jar comum (sem Main-Class), que falha com "no main
-             manifest attribute" ao rodar "java -jar" (só não aparecia local
-             porque "mvn spring-boot:run" não depende do jar empacotado). -->
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>

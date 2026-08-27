@@ -64,6 +64,7 @@ export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }:
           <img
             src={livroSelecionado.capaUrl}
             alt={livroSelecionado.titulo}
+            decoding="async"
             className="w-12 h-16 object-cover rounded flex-shrink-0"
           />
         ) : (
@@ -123,7 +124,13 @@ export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }:
               className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
             >
               {livro.capaUrl ? (
-                <img src={livro.capaUrl} alt={livro.titulo} className="w-10 h-14 object-cover rounded flex-shrink-0" />
+                <img
+                  src={livro.capaUrl}
+                  alt={livro.titulo}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-10 h-14 object-cover rounded flex-shrink-0"
+                />
               ) : (
                 <div className="w-10 h-14 bg-muted rounded flex-shrink-0" />
               )}

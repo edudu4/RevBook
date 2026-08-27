@@ -32,7 +32,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- O Gateway só repassa o JWT — cada serviço protegido valida e extrai o usuário por conta própria. -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>

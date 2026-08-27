@@ -27,7 +27,7 @@ export default function AvaliacaoEstrelas({ media, total, interativo, onAvaliar 
           >
             <Star
               className={`w-4 h-4 transition-colors ${
-                n <= exibido ? 'fill-accent text-accent' : 'text-muted-foreground'
+                n <= exibido ? 'fill-star text-star' : 'text-muted-foreground'
               }`}
             />
           </button>

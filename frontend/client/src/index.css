@@ -40,77 +40,80 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-star: var(--star);
 }
 
 :root {
-  --primary: #D4AF37;
-  --primary-foreground: #FAF9F6;
-  --sidebar-primary: #D4AF37;
-  --sidebar-primary-foreground: #FAF9F6;
-  --chart-1: #D4AF37;
+  --primary: #7A3038;
+  --primary-foreground: #FFFCF7;
+  --sidebar-primary: #7A3038;
+  --sidebar-primary-foreground: #FFFCF7;
+  --chart-1: #7A3038;
   --chart-2: #A89F8F;
   --chart-3: #8B7D6B;
   --chart-4: #6B5D4F;
   --chart-5: #4B3D2F;
   --radius: 0.5rem;
-  --background: #FAF9F6;
-  --foreground: #2C2C2C;
-  --card: #FFFFFF;
-  --card-foreground: #2C2C2C;
-  --popover: #FFFFFF;
-  --popover-foreground: #2C2C2C;
+  --background: #F8F5EF;
+  --foreground: #25221F;
+  --card: #FFFCF7;
+  --card-foreground: #25221F;
+  --popover: #FFFCF7;
+  --popover-foreground: #25221F;
   --secondary: #A89F8F;
-  --secondary-foreground: #FFFFFF;
-  --muted: #E8E6E1;
-  --muted-foreground: #7A7A7A;
-  --accent: #D4AF37;
-  --accent-foreground: #2C2C2C;
+  --secondary-foreground: #FFFCF7;
+  --muted: #EFEAE0;
+  --muted-foreground: #8F877A;
+  --accent: #7A3038;
+  --accent-foreground: #FFFCF7;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #E8E6E1;
-  --input: #FFFFFF;
-  --ring: #D4AF37;
-  --sidebar: #FAF9F6;
-  --sidebar-foreground: #2C2C2C;
-  --sidebar-accent: #D4AF37;
-  --sidebar-accent-foreground: #2C2C2C;
-  --sidebar-border: #E8E6E1;
-  --sidebar-ring: #D4AF37;
+  --border: #E5DDD2;
+  --input: #FFFCF7;
+  --ring: #7A3038;
+  --sidebar: #F8F5EF;
+  --sidebar-foreground: #25221F;
+  --sidebar-accent: #7A3038;
+  --sidebar-accent-foreground: #FFFCF7;
+  --sidebar-border: #E5DDD2;
+  --sidebar-ring: #7A3038;
+  --star: #D5A62A;
 }
 
 .dark {
-  --primary: #D4AF37;
-  --primary-foreground: #2C2C2C;
-  --sidebar-primary: #D4AF37;
-  --sidebar-primary-foreground: #2C2C2C;
-  --background: #1A1A1A;
-  --foreground: #F5F5F5;
-  --card: #2C2C2C;
-  --card-foreground: #F5F5F5;
-  --popover: #2C2C2C;
-  --popover-foreground: #F5F5F5;
+  --primary: #9C4450;
+  --primary-foreground: #F8F2E9;
+  --sidebar-primary: #9C4450;
+  --sidebar-primary-foreground: #F8F2E9;
+  --background: #1C1917;
+  --foreground: #F2EEE7;
+  --card: #262220;
+  --card-foreground: #F2EEE7;
+  --popover: #262220;
+  --popover-foreground: #F2EEE7;
   --secondary: #A89F8F;
-  --secondary-foreground: #1A1A1A;
-  --muted: #3A3A3A;
-  --muted-foreground: #AAAAAA;
-  --accent: #D4AF37;
-  --accent-foreground: #1A1A1A;
+  --secondary-foreground: #1C1917;
+  --muted: #322D28;
+  --muted-foreground: #A79E8F;
+  --accent: #9C4450;
+  --accent-foreground: #F8F2E9;
   --destructive: #EF4444;
-  --destructive-foreground: #1A1A1A;
-  --border: #3A3A3A;
-  --input: #2C2C2C;
-  --ring: #D4AF37;
-  --chart-1: #D4AF37;
+  --destructive-foreground: #1C1917;
+  --border: #3A3530;
+  --input: #262220;
+  --ring: #9C4450;
+  --chart-1: #9C4450;
   --chart-2: #A89F8F;
   --chart-3: #8B7D6B;
   --chart-4: #6B5D4F;
   --chart-5: #4B3D2F;
-  --sidebar: #2C2C2C;
-  --sidebar-foreground: #F5F5F5;
-  --sidebar-accent: #D4AF37;
-  --sidebar-accent-foreground: #1A1A1A;
-  --sidebar-border: #3A3A3A;
-  --sidebar-ring: #D4AF37;
+  --sidebar: #262220;
+  --sidebar-foreground: #F2EEE7;
+  --sidebar-accent: #9C4450;
+  --sidebar-accent-foreground: #F8F2E9;
+  --sidebar-border: #3A3530;
+  --sidebar-ring: #9C4450;
+  --star: #D5A62A;
 }
 
 @layer base {
@@ -168,8 +171,8 @@
   }
 
   .btn-nova-resenha {
-    background: #D4AF37;
-    box-shadow: 0 4px 14px -2px rgba(212, 175, 55, 0.4);
+    background: #7A3038;
+    box-shadow: 0 4px 14px -2px rgba(122, 48, 56, 0.4);
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
   }
 
@@ -178,9 +181,9 @@
   }
 
   .btn-nova-resenha:hover {
-    background: #C9A22E;
+    background: #692730;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px -4px rgba(212, 175, 55, 0.55);
+    box-shadow: 0 8px 20px -4px rgba(122, 48, 56, 0.55);
   }
 
   .btn-nova-resenha:hover svg {
@@ -195,6 +198,6 @@
 }
 
 @keyframes nova-resenha-pulso {
-  0%, 100% { box-shadow: 0 4px 14px -2px rgba(212, 175, 55, 0.4); }
-  50% { box-shadow: 0 4px 20px 2px rgba(212, 175, 55, 0.55); }
+  0%, 100% { box-shadow: 0 4px 14px -2px rgba(122, 48, 56, 0.4); }
+  50% { box-shadow: 0 4px 20px 2px rgba(122, 48, 56, 0.55); }
 }

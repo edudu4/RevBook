@@ -1,0 +1,7 @@
+revbook.com.br {
+	reverse_proxy frontend:3000
+}
+
+api.revbook.com.br {
+	reverse_proxy gateway:3001
+}

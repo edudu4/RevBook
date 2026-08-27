@@ -98,6 +98,8 @@ jobs:
           context: ${{ matrix.contexto }}
           file: ${{ matrix.dockerfile }}
           push: true
+          build-args: |
+            ${{ matrix.servico == 'frontend' && 'VITE_API_BASE_URL=https://api.revbook.com.br' || '' }}
           tags: |
             ghcr.io/${{ env.REPO_OWNER_LC }}/revbook-${{ matrix.servico }}:latest
             ghcr.io/${{ env.REPO_OWNER_LC }}/revbook-${{ matrix.servico }}:${{ github.sha }}

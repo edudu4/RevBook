@@ -54,16 +54,30 @@ services:
       AUTH_SERVICE_URL: http://auth-service:8877
       REVIEW_SERVICE_URL: http://review-service:8878
       JWT_SECRET: ${JWT_SECRET}
-    ports:
-      - "3001:3001"
 
   frontend:
     image: ghcr.io/${GHCR_OWNER}/revbook-frontend:latest
     restart: unless-stopped
     depends_on:
       - gateway
+
+  # Único ponto de entrada público — termina HTTPS (Let's Encrypt automático) e
+  # encaminha pra frontend/gateway pela rede interna do compose.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - gateway
     ports:
-      - "3000:3000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
 
 volumes:
   postgres-data:
+  caddy-data:
+  caddy-config:

@@ -144,20 +144,20 @@ export default function ReviewDetail() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-12">
-        <article className="bg-card border border-border rounded-lg p-8">
-          <div className="flex gap-6 mb-6">
+      <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+        <article className="bg-card border border-border rounded-lg p-4 sm:p-8">
+          <div className="flex gap-4 sm:gap-6 mb-6">
             {resenha.capaUrl && (
               <img
                 src={resenha.capaUrl}
                 alt={resenha.titulo}
                 decoding="async"
-                className="w-24 h-36 object-cover rounded flex-shrink-0"
+                className="w-20 h-28 sm:w-24 sm:h-36 object-cover rounded flex-shrink-0"
               />
             )}
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">{resenha.titulo}</h2>
-              <div className="flex items-center gap-4 text-muted-foreground mb-3">
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-3xl font-bold text-foreground mb-2">{resenha.titulo}</h2>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-muted-foreground mb-3">
                 <span>por {resenha.autor}</span>
                 {resenha.genero && (
                   <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">{resenha.genero}</span>
@@ -174,15 +174,15 @@ export default function ReviewDetail() {
 
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
             <div
-              className="flex items-center gap-3 w-fit hover:opacity-80"
+              className="flex items-center gap-3 min-w-0 hover:opacity-80"
               onClick={() => setLocation(`/users/${resenha.usuarioId}`)}
             >
               <Avatar>
                 <AvatarImage src={resenha.avatarUsuario} alt={resenha.nomeUsuario} />
                 <AvatarFallback>{resenha.nomeUsuario.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-semibold text-foreground">{resenha.nomeUsuario}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground truncate">{resenha.nomeUsuario}</p>
                 <p className="text-sm text-muted-foreground">
                   {new Date(resenha.criadoEm).toLocaleDateString('pt-BR')}
                   {resenha.atualizadoEm && ' (editado)'}

@@ -34,9 +34,9 @@ export default function ReactionPicker({ onSelecionarEmoji, isOpen, onClose }: R
   return (
     <div
       ref={pickerRef}
-      className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-lg shadow-lg p-2 z-50"
+      className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-lg shadow-lg p-2 z-50 max-w-[calc(100vw-2rem)]"
     >
-      <div className="flex gap-1">
+      <div className="flex flex-wrap gap-1 max-w-[220px]">
         {EMOJIS_DISPONIVEIS.map((emoji) => (
           <button
             key={emoji}

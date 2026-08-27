@@ -50,8 +50,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md px-8 py-12 bg-card rounded-lg shadow-lg border border-border">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md px-6 sm:px-8 py-10 sm:py-12 bg-card rounded-lg shadow-lg border border-border">
         <div className="flex flex-col items-center mb-8">
           <BookOpen className="w-12 h-12 text-accent mb-4" />
           <h1 className="text-3xl font-bold text-foreground mb-2">RevBook</h1>

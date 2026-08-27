@@ -1,6 +1,7 @@
 package com.revbook.reviewservice.service;
 
 import com.revbook.reviewservice.domain.Livro;
+import com.revbook.reviewservice.exception.LivroInvalidoException;
 import com.revbook.reviewservice.googlebooks.GoogleBooksClient;
 import com.revbook.reviewservice.googlebooks.LivroEncontrado;
 import com.revbook.reviewservice.repository.LivroRepository;
@@ -26,12 +27,23 @@ public class LivroService {
     }
 
     /**
-     * Primeira vez que esse googleBooksId aparece: grava um Livro novo (cache local).
-     * Nas próximas vezes, reaproveita a linha já existente.
+     * Primeira vez que esse googleBooksId aparece: confirma na Google Books API que o livro
+     * existe de verdade (sem confiar em título/autor/gênero que o cliente mandou) e grava o
+     * cache local com os dados reais. Nas próximas vezes, reaproveita a linha já existente.
      */
-    public Livro buscarOuCriar(String googleBooksId, String titulo, String autor, String genero, String capaUrl) {
+    public Livro buscarOuCriar(String googleBooksId) {
         return livroRepository.findByGoogleBooksId(googleBooksId)
-                .orElseGet(() -> livroRepository.save(new Livro(googleBooksId, titulo, autor, genero, capaUrl)));
+                .orElseGet(() -> criarComDadosVerificados(googleBooksId));
+    }
+
+    private Livro criarComDadosVerificados(String googleBooksId) {
+        LivroEncontrado livroReal = googleBooksClient.buscarPorId(googleBooksId)
+                .orElseThrow(() -> new LivroInvalidoException(
+                        "Livro não encontrado na Google Books API — não é possível criar uma resenha para ele"));
+
+        return livroRepository.save(new Livro(
+                livroReal.googleBooksId(), livroReal.titulo(), livroReal.autor(),
+                livroReal.genero(), livroReal.capaUrl()));
     }
 
     @Transactional(readOnly = true)

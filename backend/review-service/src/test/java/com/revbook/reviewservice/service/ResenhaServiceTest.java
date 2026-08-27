@@ -47,13 +47,10 @@ class ResenhaServiceTest {
     @Test
     void criar_deveReaproveitarOuCriarLivroEEntaoSalvarResenha() {
         Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
-        when(livroService.buscarOuCriar("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null))
-                .thenReturn(livro);
+        when(livroService.buscarOuCriar("gb-1")).thenReturn(livro);
         when(resenhaRepository.save(any(Resenha.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Resenha resultado = resenhaService.criar(
-                "gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null,
-                "Excelente livro.", 1L, "Fulano", "https://avatar");
+        Resenha resultado = resenhaService.criar("gb-1", "Excelente livro.", 1L, "Fulano", "https://avatar");
 
         assertThat(resultado.getLivro()).isEqualTo(livro);
         assertThat(resultado.getConteudo()).isEqualTo("Excelente livro.");

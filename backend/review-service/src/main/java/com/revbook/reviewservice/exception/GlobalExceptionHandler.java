@@ -29,4 +29,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> tratarArgumentoInvalido(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(LivroInvalidoException.class)
+    public ResponseEntity<String> tratarLivroInvalido(LivroInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

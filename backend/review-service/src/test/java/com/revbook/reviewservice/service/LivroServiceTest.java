@@ -1,12 +1,14 @@
 package com.revbook.reviewservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.revbook.reviewservice.domain.Livro;
+import com.revbook.reviewservice.exception.LivroInvalidoException;
 import com.revbook.reviewservice.googlebooks.GoogleBooksClient;
 import com.revbook.reviewservice.googlebooks.LivroEncontrado;
 import com.revbook.reviewservice.repository.LivroRepository;
@@ -45,23 +47,35 @@ class LivroServiceTest {
         Livro existente = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
         when(livroRepository.findByGoogleBooksId("gb-1")).thenReturn(Optional.of(existente));
 
-        Livro resultado = livroService.buscarOuCriar("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro resultado = livroService.buscarOuCriar("gb-1");
 
         assertThat(resultado).isSameAs(existente);
         verify(livroRepository, never()).save(any());
     }
 
     @Test
-    void buscarOuCriar_deveCriarNovoLivro_quandoAindaNaoExiste() {
+    void buscarOuCriar_deveCriarNovoLivro_quandoGoogleConfirmaQueExiste() {
         when(livroRepository.findByGoogleBooksId("gb-2")).thenReturn(Optional.empty());
+        when(googleBooksClient.buscarPorId("gb-2")).thenReturn(Optional.of(
+                new LivroEncontrado("gb-2", "Grande Sertão: Veredas", "Guimarães Rosa", "Regionalismo", "https://capa")));
         when(livroRepository.save(any(Livro.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Livro resultado = livroService.buscarOuCriar(
-                "gb-2", "Grande Sertão: Veredas", "Guimarães Rosa", "Regionalismo", "https://capa");
+        Livro resultado = livroService.buscarOuCriar("gb-2");
 
         assertThat(resultado.getGoogleBooksId()).isEqualTo("gb-2");
         assertThat(resultado.getTitulo()).isEqualTo("Grande Sertão: Veredas");
         verify(livroRepository).save(any(Livro.class));
+    }
+
+    @Test
+    void buscarOuCriar_deveLancarExcecao_quandoGoogleNaoConfirmaQueLivroExiste() {
+        when(livroRepository.findByGoogleBooksId("id-inventado")).thenReturn(Optional.empty());
+        when(googleBooksClient.buscarPorId("id-inventado")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> livroService.buscarOuCriar("id-inventado"))
+                .isInstanceOf(LivroInvalidoException.class);
+
+        verify(livroRepository, never()).save(any());
     }
 
     @Test

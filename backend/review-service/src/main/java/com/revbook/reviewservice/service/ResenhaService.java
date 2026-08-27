@@ -29,10 +29,8 @@ public class ResenhaService {
         this.livroService = livroService;
     }
 
-    public Resenha criar(
-            String googleBooksId, String titulo, String autor, String genero, String capaUrl,
-            String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
-        Livro livro = livroService.buscarOuCriar(googleBooksId, titulo, autor, genero, capaUrl);
+    public Resenha criar(String googleBooksId, String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
+        Livro livro = livroService.buscarOuCriar(googleBooksId);
         Resenha resenha = new Resenha(livro, conteudo, usuarioId, nomeUsuario, avatarUsuario);
         return resenhaRepository.save(resenha);
     }

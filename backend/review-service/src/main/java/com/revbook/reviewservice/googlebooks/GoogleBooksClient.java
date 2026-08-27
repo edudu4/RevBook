@@ -67,6 +67,34 @@ public class GoogleBooksClient {
                 .toList();
     }
 
+    /**
+     * Busca um volume específico por ID — usado pra confirmar que um googleBooksId
+     * recebido do cliente é de um livro real antes de cachear localmente (ver LivroService).
+     */
+    public Optional<LivroEncontrado> buscarPorId(String googleBooksId) {
+        if (!StringUtils.hasText(googleBooksId)) {
+            return Optional.empty();
+        }
+
+        try {
+            GoogleBooksApiResponse.Item item = restClient.get()
+                    .uri(uriBuilder -> {
+                        var builder = uriBuilder.path("/volumes/{id}");
+                        if (StringUtils.hasText(apiKey)) {
+                            builder.queryParam("key", apiKey);
+                        }
+                        return builder.build(googleBooksId);
+                    })
+                    .retrieve()
+                    .body(GoogleBooksApiResponse.Item.class);
+
+            return item != null ? paraLivroEncontrado(item) : Optional.empty();
+        } catch (RestClientException ex) {
+            log.warn("Falha ao verificar o livro '{}' na Google Books API: {}", googleBooksId, ex.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private Optional<LivroEncontrado> paraLivroEncontrado(GoogleBooksApiResponse.Item item) {
         var info = item.volumeInfo();
         if (info == null || !StringUtils.hasText(info.title())) {

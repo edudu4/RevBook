@@ -71,7 +71,7 @@ public class ResenhaController {
 
     @PostMapping("/reviews/rate")
     public void avaliar(@RequestBody RateReviewRequest dados, @UsuarioLogado UsuarioAutenticado usuario) {
-        resenhaService.avaliar(dados.reviewId(), usuario.id(), dados.value());
+        resenhaService.avaliar(dados.reviewId(), usuario.id(), dados.value(), usuario.nome(), usuario.avatar());
     }
 
     @PutMapping("/reviews/{id}")

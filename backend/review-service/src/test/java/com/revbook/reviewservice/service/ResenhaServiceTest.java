@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.revbook.reviewservice.domain.Avaliacao;
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
+import com.revbook.reviewservice.domain.TipoNotificacao;
 import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
@@ -33,6 +34,9 @@ class ResenhaServiceTest {
 
     @Mock
     private LivroService livroService;
+
+    @Mock
+    private NotificacaoService notificacaoService;
 
     @InjectMocks
     private ResenhaService resenhaService;
@@ -83,11 +87,12 @@ class ResenhaServiceTest {
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
         when(avaliacaoRepository.save(any(Avaliacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Avaliacao resultado = resenhaService.avaliar(1L, 2L, 4);
+        Avaliacao resultado = resenhaService.avaliar(1L, 2L, 4, "Ciclano", "https://avatar");
 
         assertThat(resultado.getValor()).isEqualTo(4);
         assertThat(resultado.getUsuarioId()).isEqualTo(2L);
         verify(avaliacaoRepository).save(any(Avaliacao.class));
+        verify(notificacaoService).notificar(TipoNotificacao.AVALIACAO, resenha, 2L, "Ciclano", "https://avatar");
     }
 
     @Test
@@ -97,20 +102,21 @@ class ResenhaServiceTest {
         when(avaliacaoRepository.findByResenha_IdAndUsuarioId(1L, 2L)).thenReturn(Optional.of(avaliacaoExistente));
         when(avaliacaoRepository.save(any(Avaliacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Avaliacao resultado = resenhaService.avaliar(1L, 2L, 5);
+        Avaliacao resultado = resenhaService.avaliar(1L, 2L, 5, "Ciclano", "https://avatar");
 
         assertThat(resultado.getValor()).isEqualTo(5);
         assertThat(resultado).isSameAs(avaliacaoExistente);
         verify(resenhaRepository, never()).findById(any());
+        verify(notificacaoService, never()).notificar(any(), any(), any(), any(), any());
     }
 
     @Test
     void avaliar_deveLancarExcecao_quandoValorForaDoIntervalo() {
-        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, 0))
+        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, 0, "Ciclano", null))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, 6))
+        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, 6, "Ciclano", null))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, null))
+        assertThatThrownBy(() -> resenhaService.avaliar(1L, 2L, null, "Ciclano", null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

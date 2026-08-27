@@ -2,6 +2,7 @@ package com.revbook.reviewservice.service;
 
 import com.revbook.reviewservice.domain.Comentario;
 import com.revbook.reviewservice.domain.Resenha;
+import com.revbook.reviewservice.domain.TipoNotificacao;
 import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.ComentarioRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
@@ -17,10 +18,15 @@ public class ComentarioService {
 
     private final ComentarioRepository comentarioRepository;
     private final ResenhaRepository resenhaRepository;
+    private final NotificacaoService notificacaoService;
 
-    public ComentarioService(ComentarioRepository comentarioRepository, ResenhaRepository resenhaRepository) {
+    public ComentarioService(
+            ComentarioRepository comentarioRepository,
+            ResenhaRepository resenhaRepository,
+            NotificacaoService notificacaoService) {
         this.comentarioRepository = comentarioRepository;
         this.resenhaRepository = resenhaRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     public Comentario criar(Long resenhaId, String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
@@ -28,7 +34,11 @@ public class ComentarioService {
                 .orElseThrow(() -> new NoSuchElementException("Resenha não encontrada"));
 
         Comentario comentario = new Comentario(conteudo, usuarioId, nomeUsuario, avatarUsuario, resenha);
-        return comentarioRepository.save(comentario);
+        comentario = comentarioRepository.save(comentario);
+
+        notificacaoService.notificar(TipoNotificacao.COMENTARIO, resenha, usuarioId, nomeUsuario, avatarUsuario);
+
+        return comentario;
     }
 
     @Transactional(readOnly = true)

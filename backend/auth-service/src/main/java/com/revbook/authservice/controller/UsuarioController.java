@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Fala diretamente o contrato público — o Gateway (Spring Cloud Gateway) só roteia
- * /auth/** para cá e valida o JWT nas rotas protegidas, sem transformar payload.
- */
 @RestController
 public class UsuarioController {
 

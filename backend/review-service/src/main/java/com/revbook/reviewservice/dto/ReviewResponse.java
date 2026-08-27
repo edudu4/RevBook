@@ -4,7 +4,6 @@ import com.revbook.reviewservice.domain.Resenha;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Contrato público consumido pelo front-end — os nomes seguem o que o React já espera. */
 public record ReviewResponse(
         Long id,
         String bookTitle,

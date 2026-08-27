@@ -5,10 +5,6 @@ import com.revbook.reviewservice.domain.Resenha;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-/**
- * Monta a busca combinável por titulo/autor/genero — agora via join com Livro,
- * já que a resenha não guarda mais esses campos diretamente.
- */
 public final class ResenhaSpecifications {
 
     private ResenhaSpecifications() {

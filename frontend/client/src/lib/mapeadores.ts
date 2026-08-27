@@ -1,8 +1,3 @@
-/**
- * Traduz o contrato bruto da API (inglês, `lib/api.ts`) para o modelo de
- * domínio (português, `types/dominio.ts`) — o mesmo papel que os DTOs de
- * resposta cumprem no Gateway em Spring.
- */
 import type {
   BookSearchResultApi,
   CommentApi,

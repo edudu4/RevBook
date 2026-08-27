@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Reações de um comentário agrupadas por emoji, com contagem e a lista de usuários que reagiram. */
 public record ReactionResponse(String emoji, int count, List<Long> userIds) {
 
     public static List<ReactionResponse> agrupar(List<Reacao> reacoes) {

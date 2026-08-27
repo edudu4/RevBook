@@ -10,10 +10,6 @@ interface BuscaLivroProps {
   onLimpar: () => void;
 }
 
-/**
- * Autocomplete de livros via Google Books API (GET /books/search) — substitui os
- * campos de texto livre de título/autor/gênero por um catálogo real.
- */
 export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }: BuscaLivroProps) {
   const [termo, setTermo] = useState('');
   const [resultados, setResultados] = useState<LivroEncontrado[]>([]);

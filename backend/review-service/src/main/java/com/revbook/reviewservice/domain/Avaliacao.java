@@ -18,7 +18,6 @@ public class Avaliacao {
     @Column(nullable = false)
     private Long usuarioId;
 
-    /** 1 a 5 estrelas, ou apenas "curtir" (1). */
     @Column(nullable = false)
     private Integer valor;
 

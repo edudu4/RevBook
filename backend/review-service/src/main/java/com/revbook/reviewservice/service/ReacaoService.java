@@ -23,7 +23,6 @@ public class ReacaoService {
         this.comentarioRepository = comentarioRepository;
     }
 
-    /** Alterna a reação: se já existe, remove (toggle); caso contrário, cria. */
     public Optional<Reacao> alternar(Long comentarioId, Long usuarioId, String emoji) {
         Optional<Reacao> existente =
                 reacaoRepository.findByComentario_IdAndUsuarioIdAndEmoji(comentarioId, usuarioId, emoji);

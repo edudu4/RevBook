@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Fala diretamente o contrato público em inglês — o Gateway (Spring Cloud Gateway) só
- * roteia e valida o JWT, sem transformar payload nenhum.
- */
 @RestController
 public class ResenhaController {
 

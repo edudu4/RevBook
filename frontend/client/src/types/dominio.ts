@@ -1,10 +1,3 @@
-/**
- * Modelo de domínio do app, em português — espelha exatamente as entidades do
- * backend (Resenha, Comentario, Reacao, Avaliacao, Usuario). Nomes técnicos/de
- * infraestrutura (tipos de resposta HTTP, DTOs de request) ficam em inglês, no
- * arquivo `lib/api.ts`; a tradução entre os dois mundos acontece em `lib/mapeadores.ts`.
- */
-
 export interface Usuario {
   id: number;
   email: string;
@@ -58,7 +51,6 @@ export interface Resenha {
   comentarios: Comentario[];
 }
 
-/** Um resultado de busca na Google Books — ainda não é necessariamente uma Resenha. */
 export interface LivroEncontrado {
   googleBooksId: string;
   titulo: string;

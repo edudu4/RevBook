@@ -4,7 +4,6 @@ import com.revbook.reviewservice.domain.Comentario;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Usado em GET /users/{userId}/comments — inclui um resumo da resenha associada. */
 public record CommentWithReviewResponse(
         Long id,
         String content,

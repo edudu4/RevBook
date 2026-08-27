@@ -8,7 +8,6 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/** Mesma chave HMAC do auth-service e do Gateway — só valida, não emite tokens aqui. */
 @Service
 public class JwtService {
 

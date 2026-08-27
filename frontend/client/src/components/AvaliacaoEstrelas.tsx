@@ -8,7 +8,6 @@ interface AvaliacaoEstrelasProps {
   onAvaliar?: (valor: number) => void;
 }
 
-/** Exibe a média em estrelas (1-5); quando interativo, permite clicar pra avaliar. */
 export default function AvaliacaoEstrelas({ media, total, interativo, onAvaliar }: AvaliacaoEstrelasProps) {
   const [hover, setHover] = useState<number | null>(null);
   const exibido = hover ?? Math.round(media);

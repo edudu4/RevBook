@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import CapaLivro from '@/components/CapaLivro';
 import Spinner from '@/components/Spinner';
 import { API_BASE_URL, type BookSearchResultApi } from '@/lib/api';
 import { paraLivroEncontrado } from '@/lib/mapeadores';
@@ -61,16 +62,12 @@ export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }:
   if (livroSelecionado) {
     return (
       <div className="flex items-center gap-3 p-3 border border-border rounded-lg bg-background">
-        {livroSelecionado.capaUrl ? (
-          <img
-            src={livroSelecionado.capaUrl}
-            alt={livroSelecionado.titulo}
-            decoding="async"
-            className="w-12 h-16 object-cover rounded flex-shrink-0"
-          />
-        ) : (
-          <div className="w-12 h-16 bg-muted rounded flex-shrink-0" />
-        )}
+        <CapaLivro
+          src={livroSelecionado.capaUrl}
+          alt={livroSelecionado.titulo}
+          loading="eager"
+          className="w-12 h-16 object-cover rounded flex-shrink-0"
+        />
         <div className="flex-1 min-w-0">
           <p className="font-medium text-foreground truncate">{livroSelecionado.titulo}</p>
           <p className="text-sm text-muted-foreground truncate">{livroSelecionado.autor}</p>
@@ -124,17 +121,11 @@ export default function BuscaLivro({ livroSelecionado, onSelecionar, onLimpar }:
               }}
               className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
             >
-              {livro.capaUrl ? (
-                <img
-                  src={livro.capaUrl}
-                  alt={livro.titulo}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-10 h-14 object-cover rounded flex-shrink-0"
-                />
-              ) : (
-                <div className="w-10 h-14 bg-muted rounded flex-shrink-0" />
-              )}
+              <CapaLivro
+                src={livro.capaUrl}
+                alt={livro.titulo}
+                className="w-10 h-14 object-cover rounded flex-shrink-0"
+              />
               <div className="min-w-0">
                 <p className="font-medium text-foreground truncate">{livro.titulo}</p>
                 <p className="text-sm text-muted-foreground truncate">{livro.autor}</p>

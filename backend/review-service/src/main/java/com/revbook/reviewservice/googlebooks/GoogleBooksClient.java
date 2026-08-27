@@ -10,11 +10,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Busca livros na Google Books API (não há endpoint de "catálogo completo" — só busca
- * por termo, com limite de resultados). Não persiste nada: quem decide o que vira
- * cache local é o LivroService, quando o usuário efetivamente escolhe um resultado.
- */
 @Component
 public class GoogleBooksClient {
 
@@ -51,7 +46,6 @@ public class GoogleBooksClient {
                     .retrieve()
                     .body(GoogleBooksApiResponse.class);
         } catch (RestClientException ex) {
-            // Cota/instabilidade da Google Books API não pode derrubar a busca do usuário.
             log.warn("Falha ao consultar a Google Books API para o termo '{}': {}", termo, ex.getMessage());
             return List.of();
         }
@@ -67,10 +61,6 @@ public class GoogleBooksClient {
                 .toList();
     }
 
-    /**
-     * Busca um volume específico por ID — usado pra confirmar que um googleBooksId
-     * recebido do cliente é de um livro real antes de cachear localmente (ver LivroService).
-     */
     public Optional<LivroEncontrado> buscarPorId(String googleBooksId) {
         if (!StringUtils.hasText(googleBooksId)) {
             return Optional.empty();

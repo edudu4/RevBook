@@ -11,11 +11,6 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-/**
- * Só decide QUEM pode chamar cada rota — a validação da assinatura do JWT vem pronta do
- * OAuth2 Resource Server (configurado em application.yml), e o token é repassado sem
- * alteração para o serviço de destino, que extrai o usuário autenticado por conta própria.
- */
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {

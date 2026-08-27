@@ -6,10 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-/**
- * Cache local dos livros escolhidos via Google Books API — populado sob demanda na
- * primeira vez que alguém seleciona aquele livro ao criar uma resenha (ver LivroService).
- */
 @Entity
 public class Livro {
 

@@ -10,11 +10,6 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/**
- * Valida o ID token emitido pelo Google Identity Services: assinatura, emissor, audience
- * (nosso Client ID) e expiração. Sem isso, qualquer cliente poderia forjar um login mandando
- * um email arbitrário direto pro endpoint.
- */
 @Service
 public class GoogleTokenService {
 

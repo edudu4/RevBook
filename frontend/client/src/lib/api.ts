@@ -1,11 +1,3 @@
-/**
- * Formato bruto que trafega na rede (JSON do Gateway) — em inglês, pois é o
- * contrato público exposto pelo backend e consumido por `fetch`. Nada aqui é
- * usado fora da camada de acesso a dados; os componentes só enxergam os tipos
- * de domínio em `types/dominio.ts`, convertidos por `lib/mapeadores.ts`.
- */
-
-/** Em produção, defina VITE_API_BASE_URL no build (aponta pro Gateway real). */
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export interface UserApi {

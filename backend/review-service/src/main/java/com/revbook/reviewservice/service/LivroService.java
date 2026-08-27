@@ -26,11 +26,6 @@ public class LivroService {
         return googleBooksClient.buscar(termo);
     }
 
-    /**
-     * Primeira vez que esse googleBooksId aparece: confirma na Google Books API que o livro
-     * existe de verdade (sem confiar em título/autor/gênero que o cliente mandou) e grava o
-     * cache local com os dados reais. Nas próximas vezes, reaproveita a linha já existente.
-     */
     public Livro buscarOuCriar(String googleBooksId) {
         return livroRepository.findByGoogleBooksId(googleBooksId)
                 .orElseGet(() -> criarComDadosVerificados(googleBooksId));

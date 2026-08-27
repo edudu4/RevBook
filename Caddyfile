@@ -1,7 +1,15 @@
 revbook.com.br {
+	log {
+		output file /var/log/caddy/access.log
+		format json
+	}
 	reverse_proxy frontend:3000
 }
 
 api.revbook.com.br {
+	log {
+		output file /var/log/caddy/access.log
+		format json
+	}
 	reverse_proxy gateway:3001
 }

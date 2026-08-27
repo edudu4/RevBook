@@ -41,6 +41,7 @@ spring:
             allowedOriginPatterns: "*"
             allowedMethods: "*"
             allowedHeaders: "*"
+            allowCredentials: true
 
 revbook:
   jwt:

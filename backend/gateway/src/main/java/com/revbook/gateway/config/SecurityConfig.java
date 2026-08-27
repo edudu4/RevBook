@@ -1,5 +1,6 @@
 package com.revbook.gateway.config;
 
+import com.revbook.gateway.security.CookieBearerTokenConverter;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +17,12 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
 
     private final String jwtSecret;
+    private final CookieBearerTokenConverter cookieBearerTokenConverter;
 
-    public SecurityConfig(@Value("${revbook.jwt.secret}") String jwtSecret) {
+    public SecurityConfig(
+            @Value("${revbook.jwt.secret}") String jwtSecret, CookieBearerTokenConverter cookieBearerTokenConverter) {
         this.jwtSecret = jwtSecret;
+        this.cookieBearerTokenConverter = cookieBearerTokenConverter;
     }
 
     @Bean
@@ -42,8 +46,10 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/comments/*/reactions").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/reactions/*").authenticated()
                         .anyExchange().permitAll())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
-                }));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenConverter(cookieBearerTokenConverter)
+                        .jwt(jwt -> {
+                        }));
 
         return http.build();
     }

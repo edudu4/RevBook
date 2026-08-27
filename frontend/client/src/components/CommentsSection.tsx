@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +15,8 @@ interface CommentsSectionProps {
 }
 
 export default function CommentsSection({ resenhaId, onComentarioAdicionado }: CommentsSectionProps) {
-  const { user, token, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const { user, isAuthenticated } = useAuth();
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [novoComentario, setNovoComentario] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
   };
 
   const handleAdicionarComentario = async () => {
-    if (!token || !novoComentario.trim()) {
+    if (!isAuthenticated || !novoComentario.trim()) {
       return;
     }
 
@@ -47,9 +49,9 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
     try {
       const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}/comments`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: novoComentario }),
       });
@@ -67,14 +69,12 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
   };
 
   const handleExcluirComentario = async (comentarioId: number) => {
-    if (!token) return;
+    if (!isAuthenticated) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -86,14 +86,14 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
   };
 
   const handleAtualizarComentario = async (comentarioId: number) => {
-    if (!token || !editContent.trim()) return;
+    if (!isAuthenticated || !editContent.trim()) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: editContent }),
       });
@@ -109,14 +109,14 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
   };
 
   const handleAdicionarReacao = async (comentarioId: number, emoji: string) => {
-    if (!token) return;
+    if (!isAuthenticated) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}/reactions`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ emoji }),
       });
@@ -172,7 +172,10 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
           comentarios.map((comentario) => (
             <div key={comentario.id} className="p-4 bg-card border border-border rounded-lg">
               <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-3 w-fit hover:opacity-80"
+                  onClick={() => setLocation(`/users/${comentario.usuarioId}`)}
+                >
                   <Avatar>
                     <AvatarImage src={comentario.avatarUsuario} alt={comentario.nomeUsuario} />
                     <AvatarFallback>{comentario.nomeUsuario.charAt(0).toUpperCase()}</AvatarFallback>

@@ -63,6 +63,8 @@ export interface EstatisticasUsuario {
   totalResenhas: number;
   totalComentarios: number;
   totalAvaliacoesRecebidas: number;
+  nomeUsuario?: string;
+  avatarUsuario?: string;
 }
 
 export interface FiltrosBusca {

@@ -87,5 +87,7 @@ export function paraEstatisticas(api: UserStatsApi): EstatisticasUsuario {
     totalResenhas: api.reviewCount,
     totalComentarios: api.commentCount,
     totalAvaliacoesRecebidas: api.totalRatingsReceived,
+    nomeUsuario: api.userName,
+    avatarUsuario: api.userAvatar,
   };
 }

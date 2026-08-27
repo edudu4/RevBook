@@ -10,6 +10,8 @@ import com.revbook.reviewservice.repository.ResenhaSpecifications;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +38,8 @@ public class ResenhaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Resenha> listarTodas() {
-        return resenhaRepository.findAllByOrderByCriadoEmDesc();
+    public List<Resenha> listarPagina(int pagina, int tamanho) {
+        return resenhaRepository.findAllByOrderByCriadoEmDesc(PageRequest.of(pagina, tamanho));
     }
 
     @Transactional(readOnly = true)
@@ -52,10 +54,10 @@ public class ResenhaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Resenha> buscar(String titulo, String autor, String genero) {
-        return resenhaRepository.findAll(
-                ResenhaSpecifications.comFiltros(titulo, autor, genero),
-                Sort.by(Sort.Direction.DESC, "criadoEm"));
+    public List<Resenha> buscar(String titulo, String autor, String genero, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "criadoEm"));
+        return resenhaRepository.findAll(ResenhaSpecifications.comFiltros(titulo, autor, genero), pageable)
+                .getContent();
     }
 
     public Avaliacao avaliar(Long resenhaId, Long usuarioId, Integer valor) {

@@ -37,16 +37,21 @@ public class ResenhaController {
     }
 
     @GetMapping("/reviews")
-    public List<ReviewResponse> listarTodas() {
-        return resenhaService.listarTodas().stream().map(ReviewResponse::de).toList();
+    public List<ReviewResponse> listarTodas(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return resenhaService.listarPagina(page, size).stream().map(ReviewResponse::de).toList();
     }
 
     @GetMapping("/reviews/search")
     public List<ReviewResponse> buscar(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
-            @RequestParam(required = false) String genre) {
-        return resenhaService.buscar(title, author, genre).stream().map(ReviewResponse::de).toList();
+            @RequestParam(required = false) String genre,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return resenhaService.buscar(title, author, genre, page, size).stream()
+                .map(ReviewResponse::de)
+                .toList();
     }
 
     @GetMapping("/genres")

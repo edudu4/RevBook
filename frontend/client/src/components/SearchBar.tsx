@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { API_BASE_URL } from '@/lib/api';
 import type { FiltrosBusca } from '@/types/dominio';
 
 interface SearchBarProps {
   onSearch: (filtros: FiltrosBusca) => void;
   onClear: () => void;
+  buscando?: boolean;
 }
 
-export default function SearchBar({ onSearch, onClear }: SearchBarProps) {
-  const [titulo, setTitulo] = useState('');
-  const [autor, setAutor] = useState('');
-  const [genero, setGenero] = useState('');
+const DEBOUNCE_MS = 350;
+
+export default function SearchBar({ onSearch, onClear, buscando }: SearchBarProps) {
+  const [termo, setTermo] = useState('');
+  const [genero, setGenero] = useState<string | null>(null);
   const [generos, setGeneros] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     buscarGeneros();
@@ -32,117 +33,76 @@ export default function SearchBar({ onSearch, onClear }: SearchBarProps) {
     }
   };
 
-  const handleBuscar = () => {
-    onSearch({
-      titulo: titulo || undefined,
-      autor: autor || undefined,
-      genero: genero || undefined,
-    });
+  const disparar = (novoTermo: string, novoGenero: string | null) => {
+    if (!novoTermo.trim() && !novoGenero) {
+      onClear();
+      return;
+    }
+    onSearch({ termo: novoTermo.trim() || undefined, genero: novoGenero || undefined });
+  };
+
+  const handleTermoChange = (valor: string) => {
+    setTermo(valor);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => disparar(valor, genero), DEBOUNCE_MS);
+  };
+
+  const handleToggleGenero = (g: string) => {
+    const novoGenero = genero === g ? null : g;
+    setGenero(novoGenero);
+    disparar(termo, novoGenero);
   };
 
   const handleLimpar = () => {
-    setTitulo('');
-    setAutor('');
-    setGenero('');
+    setTermo('');
+    setGenero(null);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     onClear();
   };
 
-  const temFiltros = titulo || autor || genero;
+  const temFiltros = termo.trim() || genero;
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Search className="w-5 h-5 text-accent" />
-          Busca Avançada
-        </h3>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {isOpen ? '▼' : '▶'}
-        </button>
+    <div className="mb-8">
+      <div className="relative">
+        {buscando ? (
+          <div className="spinner-revbook spinner-revbook--pequeno absolute left-4 top-1/2 -translate-y-1/2" />
+        ) : (
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        )}
+        <input
+          type="text"
+          value={termo}
+          onChange={(e) => handleTermoChange(e.target.value)}
+          placeholder="Buscar por título ou autor..."
+          className="w-full pl-12 pr-11 py-3 border border-border rounded-full bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent transition-shadow"
+        />
+        {temFiltros && (
+          <button
+            onClick={handleLimpar}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            title="Limpar busca"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      {isOpen && (
-        <div className="space-y-4">
-          {/* Title Search */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Título do Livro
-            </label>
-            <input
-              type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Digite o título..."
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleBuscar();
-                }
-              }}
-            />
-          </div>
-
-          {/* Author Search */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Autor
-            </label>
-            <input
-              type="text"
-              value={autor}
-              onChange={(e) => setAutor(e.target.value)}
-              placeholder="Digite o nome do autor..."
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleBuscar();
-                }
-              }}
-            />
-          </div>
-
-          {/* Genre Select */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Gênero
-            </label>
-            <select
-              value={genero}
-              onChange={(e) => setGenero(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+      {generos.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {generos.map((g) => (
+            <button
+              key={g}
+              onClick={() => handleToggleGenero(g)}
+              className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
+                genero === g
+                  ? 'bg-accent text-accent-foreground border-accent'
+                  : 'bg-card text-muted-foreground border-border hover:border-accent hover:text-accent'
+              }`}
             >
-              <option value="">Selecione um gênero...</option>
-              {generos.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleBuscar}
-              className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Buscar
-            </Button>
-            {temFiltros && (
-              <Button
-                onClick={handleLimpar}
-                variant="outline"
-                className="flex-1"
-              >
-                <X className="w-4 h-4 mr-2" />
-                Limpar
-              </Button>
-            )}
-          </div>
+              {g}
+            </button>
+          ))}
         </div>
       )}
     </div>

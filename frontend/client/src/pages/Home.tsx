@@ -29,18 +29,19 @@ export default function Home() {
   const [livroSelecionado, setLivroSelecionado] = useState<LivroEncontrado | null>(null);
   const [conteudoResenha, setConteudoResenha] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [buscando, setBuscando] = useState(false);
 
   const paginaRef = useRef(0);
   const carregandoRef = useRef(false);
   const temMaisRef = useRef(true);
   const loadingRef = useRef(true);
+  const buscandoRef = useRef(false);
   const filtrosAtivosRef = useRef<FiltrosBusca | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const montarUrlPagina = (pagina: number, filtros: FiltrosBusca | null) => {
     const params = new URLSearchParams();
-    if (filtros?.titulo) params.append('title', filtros.titulo);
-    if (filtros?.autor) params.append('author', filtros.autor);
+    if (filtros?.termo) params.append('q', filtros.termo);
     if (filtros?.genero) params.append('genre', filtros.genero);
     params.append('page', String(pagina));
     params.append('size', String(TAMANHO_PAGINA));
@@ -78,8 +79,8 @@ export default function Home() {
 
   const handleBuscar = async (filtros: FiltrosBusca) => {
     try {
-      loadingRef.current = true;
-      setLoading(true);
+      buscandoRef.current = true;
+      setBuscando(true);
       setIsSearching(true);
       filtrosAtivosRef.current = filtros;
 
@@ -96,8 +97,8 @@ export default function Home() {
     } catch (error) {
       console.error('Failed to search reviews:', error);
     } finally {
-      loadingRef.current = false;
-      setLoading(false);
+      buscandoRef.current = false;
+      setBuscando(false);
     }
   };
 
@@ -107,7 +108,7 @@ export default function Home() {
   };
 
   const carregarMais = async () => {
-    if (carregandoRef.current || !temMaisRef.current || loadingRef.current) return;
+    if (carregandoRef.current || !temMaisRef.current || loadingRef.current || buscandoRef.current) return;
 
     carregandoRef.current = true;
     setCarregandoMais(true);
@@ -276,7 +277,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12">
         {/* Search Bar */}
-        <SearchBar onSearch={handleBuscar} onClear={handleLimparBusca} />
+        <SearchBar onSearch={handleBuscar} onClear={handleLimparBusca} buscando={buscando} />
 
         {/* Status */}
         {isSearching && (

@@ -14,6 +14,7 @@ import com.revbook.reviewservice.domain.TipoNotificacao;
 import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +64,17 @@ class ResenhaServiceTest {
         assertThat(resultado.getConteudo()).isEqualTo("Excelente livro.");
         assertThat(resultado.getAvatarUsuario()).isEqualTo("https://avatar");
         verify(resenhaRepository).save(any(Resenha.class));
+    }
+
+    @Test
+    void buscar_deveRetornarConteudoDaPagina() {
+        Resenha resenha = novaResenhaComId(1L);
+        when(resenhaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(resenha)));
+
+        List<Resenha> resultado = resenhaService.buscar("casmurro", "Romance", 0, 10);
+
+        assertThat(resultado).containsExactly(resenha);
     }
 
     @Test

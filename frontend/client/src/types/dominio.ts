@@ -68,8 +68,7 @@ export interface EstatisticasUsuario {
 }
 
 export interface FiltrosBusca {
-  titulo?: string;
-  autor?: string;
+  termo?: string;
   genero?: string;
 }
 

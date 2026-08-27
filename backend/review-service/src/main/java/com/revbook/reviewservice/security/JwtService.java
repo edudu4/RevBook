@@ -29,7 +29,8 @@ public class JwtService {
             return new UsuarioAutenticado(
                     Long.valueOf(claims.getSubject()),
                     claims.get("email", String.class),
-                    claims.get("name", String.class));
+                    claims.get("name", String.class),
+                    claims.get("avatar", String.class));
         } catch (JwtException | IllegalArgumentException ex) {
             return null;
         }

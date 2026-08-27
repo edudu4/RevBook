@@ -33,6 +33,8 @@ public class Resenha {
     @Column(nullable = false)
     private String nomeUsuario;
 
+    private String avatarUsuario;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm = LocalDateTime.now();
 
@@ -45,11 +47,12 @@ public class Resenha {
     protected Resenha() {
     }
 
-    public Resenha(Livro livro, String conteudo, Long usuarioId, String nomeUsuario) {
+    public Resenha(Livro livro, String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
         this.livro = livro;
         this.conteudo = conteudo;
         this.usuarioId = usuarioId;
         this.nomeUsuario = nomeUsuario;
+        this.avatarUsuario = avatarUsuario;
     }
 
     public Long getId() {
@@ -70,6 +73,10 @@ public class Resenha {
 
     public String getNomeUsuario() {
         return nomeUsuario;
+    }
+
+    public String getAvatarUsuario() {
+        return avatarUsuario;
     }
 
     public LocalDateTime getCriadoEm() {

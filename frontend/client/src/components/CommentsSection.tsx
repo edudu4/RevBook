@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReactionPicker from './ReactionPicker';
 import { MessageSquare, Trash2, Edit2, Check, X, Smile } from 'lucide-react';
 import { API_BASE_URL, type CommentApi } from '@/lib/api';
@@ -171,12 +172,18 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
           comentarios.map((comentario) => (
             <div key={comentario.id} className="p-4 bg-card border border-border rounded-lg">
               <div className="flex justify-between items-start mb-2">
-                <div>
-                  <p className="font-semibold text-foreground">{comentario.nomeUsuario}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(comentario.criadoEm).toLocaleDateString('pt-BR')}
-                    {comentario.atualizadoEm && ' (editado)'}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarImage src={comentario.avatarUsuario} alt={comentario.nomeUsuario} />
+                    <AvatarFallback>{comentario.nomeUsuario.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-foreground">{comentario.nomeUsuario}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(comentario.criadoEm).toLocaleDateString('pt-BR')}
+                      {comentario.atualizadoEm && ' (editado)'}
+                    </p>
+                  </div>
                 </div>
                 {isAuthenticated && user?.id === comentario.usuarioId && (
                   <div className="flex gap-2">

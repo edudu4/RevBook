@@ -29,7 +29,7 @@ public class ComentarioController {
             @PathVariable Long reviewId,
             @RequestBody CommentContentRequest dados,
             @UsuarioLogado UsuarioAutenticado usuario) {
-        var comentario = comentarioService.criar(reviewId, dados.content(), usuario.id(), usuario.nome(), "");
+        var comentario = comentarioService.criar(reviewId, dados.content(), usuario.id(), usuario.nome(), usuario.avatar());
         return CommentResponse.de(comentario);
     }
 

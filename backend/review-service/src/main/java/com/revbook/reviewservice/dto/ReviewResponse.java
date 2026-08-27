@@ -14,6 +14,7 @@ public record ReviewResponse(
         String content,
         Long userId,
         String userName,
+        String userAvatar,
         LocalDateTime createdAt,
         List<RatingResponse> ratings,
         List<CommentResponse> comments) {
@@ -29,6 +30,7 @@ public record ReviewResponse(
                 resenha.getConteudo(),
                 resenha.getUsuarioId(),
                 resenha.getNomeUsuario(),
+                resenha.getAvatarUsuario(),
                 resenha.getCriadoEm(),
                 resenha.getAvaliacoes().stream().map(RatingResponse::de).toList(),
                 resenha.getComentarios().stream().map(CommentResponse::de).toList());

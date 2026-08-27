@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, BookOpen, MessageSquare, Award } from 'lucide-react';
 import { API_BASE_URL, type CommentWithReviewApi, type ReviewApi, type UserStatsApi } from '@/lib/api';
 import { paraComentarioComResenha, paraEstatisticas, paraResenha } from '@/lib/mapeadores';
@@ -84,11 +85,12 @@ export default function Profile() {
         {/* Profile Header */}
         <div className="bg-card border border-border rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center">
-              <span className="text-4xl font-bold text-accent-foreground">
+            <Avatar className="size-24">
+              <AvatarImage src={user?.avatar} alt={user?.nome} />
+              <AvatarFallback className="text-4xl font-bold">
                 {user?.nome?.charAt(0).toUpperCase()}
-              </span>
-            </div>
+              </AvatarFallback>
+            </Avatar>
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">{user?.nome}</h2>
               <p className="text-muted-foreground">{user?.email}</p>

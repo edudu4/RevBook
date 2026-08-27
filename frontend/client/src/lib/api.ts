@@ -58,6 +58,7 @@ export interface ReviewApi {
   content: string;
   userId: number;
   userName: string;
+  userAvatar?: string;
   createdAt: string;
   ratings?: RatingApi[];
   comments?: CommentApi[];

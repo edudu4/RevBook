@@ -51,6 +51,7 @@ export interface Resenha {
   conteudo: string;
   usuarioId: number;
   nomeUsuario: string;
+  avatarUsuario?: string;
   criadoEm: string;
   avaliacoes: Avaliacao[];
   comentarios: Comentario[];

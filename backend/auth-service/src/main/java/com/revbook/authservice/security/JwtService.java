@@ -29,6 +29,7 @@ public class JwtService {
                 .subject(String.valueOf(usuario.getId()))
                 .claim("email", usuario.getEmail())
                 .claim("name", usuario.getNome())
+                .claim("avatar", usuario.getAvatar())
                 .issuedAt(Date.from(agora))
                 .expiration(Date.from(agora.plus(expirationMinutes, ChronoUnit.MINUTES)))
                 .signWith(key, Jwts.SIG.HS256)

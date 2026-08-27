@@ -29,9 +29,9 @@ public class ResenhaService {
 
     public Resenha criar(
             String googleBooksId, String titulo, String autor, String genero, String capaUrl,
-            String conteudo, Long usuarioId, String nomeUsuario) {
+            String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
         Livro livro = livroService.buscarOuCriar(googleBooksId, titulo, autor, genero, capaUrl);
-        Resenha resenha = new Resenha(livro, conteudo, usuarioId, nomeUsuario);
+        Resenha resenha = new Resenha(livro, conteudo, usuarioId, nomeUsuario, avatarUsuario);
         return resenhaRepository.save(resenha);
     }
 
@@ -59,6 +59,10 @@ public class ResenhaService {
     }
 
     public Avaliacao avaliar(Long resenhaId, Long usuarioId, Integer valor) {
+        if (valor == null || valor < 1 || valor > 5) {
+            throw new IllegalArgumentException("A avaliação deve ser um valor entre 1 e 5 estrelas");
+        }
+
         Avaliacao avaliacao = avaliacaoRepository.findByResenha_IdAndUsuarioId(resenhaId, usuarioId)
                 .orElse(null);
 

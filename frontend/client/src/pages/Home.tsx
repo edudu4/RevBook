@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CommentsSection from '@/components/CommentsSection';
 import SearchBar from '@/components/SearchBar';
 import BuscaLivro from '@/components/BuscaLivro';
-import { Star, LogOut, Plus } from 'lucide-react';
+import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
+import { LogOut, Plus } from 'lucide-react';
 import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib/api';
 import { paraResenha } from '@/lib/mapeadores';
 import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
@@ -103,7 +105,7 @@ export default function Home() {
     }
   };
 
-  const handleAvaliarResenha = async (resenhaId: number) => {
+  const handleAvaliarResenha = async (resenhaId: number, valor: number) => {
     if (!token) {
       setLocation('/login');
       return;
@@ -116,7 +118,7 @@ export default function Home() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ reviewId: resenhaId, value: 1 }),
+        body: JSON.stringify({ reviewId: resenhaId, value: valor }),
       });
       buscarResenhas();
     } catch (error) {
@@ -149,8 +151,12 @@ export default function Home() {
                   variant="ghost"
                   size="sm"
                   title="Meu Perfil"
+                  className="p-0 rounded-full"
                 >
-                  <span className="text-sm">👤</span>
+                  <Avatar>
+                    <AvatarImage src={user?.avatar} alt={user?.nome} />
+                    <AvatarFallback>{user?.nome?.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
                 </Button>
                 <Button
                   onClick={() => {
@@ -244,6 +250,15 @@ export default function Home() {
                         </>
                       )}
                     </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Avatar className="size-6">
+                        <AvatarImage src={resenha.avatarUsuario} alt={resenha.nomeUsuario} />
+                        <AvatarFallback className="text-xs">
+                          {resenha.nomeUsuario.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-muted-foreground">{resenha.nomeUsuario}</span>
+                    </div>
                   </div>
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -257,22 +272,20 @@ export default function Home() {
 
               <div className="flex justify-between items-center pt-4 border-t border-border">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>{resenha.avaliacoes.length} avaliações</span>
+                  <AvaliacaoEstrelas
+                    media={
+                      resenha.avaliacoes.length
+                        ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
+                        : 0
+                    }
+                    total={resenha.avaliacoes.length}
+                    interativo={isAuthenticated}
+                    onAvaliar={(valor) => handleAvaliarResenha(resenha.id, valor)}
+                  />
                   <span>•</span>
                   <span>{resenha.comentarios.length} comentários</span>
                 </div>
                 <div className="flex gap-2">
-                  {isAuthenticated && (
-                    <Button
-                      onClick={() => handleAvaliarResenha(resenha.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-accent hover:text-accent/80"
-                    >
-                      <Star className="w-4 h-4 mr-1" />
-                      Avaliar
-                    </Button>
-                  )}
                   <Button
                     onClick={() =>
                       setExpandedResenhaId(

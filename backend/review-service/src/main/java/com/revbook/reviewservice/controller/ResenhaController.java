@@ -34,7 +34,7 @@ public class ResenhaController {
     public ReviewResponse criar(@RequestBody CreateReviewRequest dados, @UsuarioLogado UsuarioAutenticado usuario) {
         var resenha = resenhaService.criar(
                 dados.googleBooksId(), dados.bookTitle(), dados.author(), dados.genre(), dados.coverUrl(),
-                dados.content(), usuario.id(), usuario.nome());
+                dados.content(), usuario.id(), usuario.nome(), usuario.avatar());
         return ReviewResponse.de(resenha);
     }
 

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
+import CapaLivro from '@/components/CapaLivro';
 import CommentsSection from '@/components/CommentsSection';
 import Footer from '@/components/Footer';
 import Spinner from '@/components/Spinner';
@@ -147,14 +148,12 @@ export default function ReviewDetail() {
       <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
         <article className="bg-card border border-border rounded-lg p-4 sm:p-8">
           <div className="flex gap-4 sm:gap-6 mb-6">
-            {resenha.capaUrl && (
-              <img
-                src={resenha.capaUrl}
-                alt={resenha.titulo}
-                decoding="async"
-                className="w-20 h-28 sm:w-24 sm:h-36 object-cover rounded flex-shrink-0"
-              />
-            )}
+            <CapaLivro
+              src={resenha.capaUrl}
+              alt={resenha.titulo}
+              loading="eager"
+              className="w-20 h-28 sm:w-24 sm:h-36 object-cover rounded flex-shrink-0"
+            />
             <div className="min-w-0">
               <h2 className="text-xl sm:text-3xl font-bold text-foreground mb-2">{resenha.titulo}</h2>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-muted-foreground mb-3">

@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import CapaLivro from '@/components/CapaLivro';
 import Footer from '@/components/Footer';
 import NotificationBell from '@/components/NotificationBell';
 import Spinner from '@/components/Spinner';
@@ -11,6 +12,7 @@ import BuscaLivro from '@/components/BuscaLivro';
 import AvaliacaoEstrelas from '@/components/AvaliacaoEstrelas';
 import { LogOut, Plus } from 'lucide-react';
 import { API_BASE_URL, type CreateReviewApiRequest, type ReviewApi } from '@/lib/api';
+import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraResenha } from '@/lib/mapeadores';
 import { preloadImagens } from '@/lib/preloadImagens';
 import type { FiltrosBusca, LivroEncontrado, Resenha } from '@/types/dominio';
@@ -318,15 +320,11 @@ export default function Home() {
             >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-4">
                 <div className="flex gap-4 min-w-0">
-                  {resenha.capaUrl && (
-                    <img
-                      src={resenha.capaUrl}
-                      alt={resenha.titulo}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-16 h-24 object-cover rounded flex-shrink-0"
-                    />
-                  )}
+                  <CapaLivro
+                    src={resenha.capaUrl}
+                    alt={resenha.titulo}
+                    className="w-16 h-24 object-cover rounded flex-shrink-0"
+                  />
                   <div className="min-w-0">
                     <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-1">
                       {resenha.titulo}

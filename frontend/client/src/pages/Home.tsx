@@ -21,6 +21,7 @@ export default function Home() {
   const { user, logout, isAuthenticated } = useAuth();
   const [resenhas, setResenhas] = useState<Resenha[]>([]);
   const [loading, setLoading] = useState(true);
+  const [primeiraCargaConcluida, setPrimeiraCargaConcluida] = useState(false);
   const [carregandoMais, setCarregandoMais] = useState(false);
   const [temMais, setTemMais] = useState(true);
   const [showNewReviewModal, setShowNewReviewModal] = useState(false);
@@ -31,6 +32,7 @@ export default function Home() {
   const paginaRef = useRef(0);
   const carregandoRef = useRef(false);
   const temMaisRef = useRef(true);
+  const loadingRef = useRef(true);
   const filtrosAtivosRef = useRef<FiltrosBusca | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -51,6 +53,7 @@ export default function Home() {
 
   const buscarResenhas = async () => {
     try {
+      loadingRef.current = true;
       setLoading(true);
       filtrosAtivosRef.current = null;
       const response = await fetch(montarUrlPagina(0, null));
@@ -66,12 +69,15 @@ export default function Home() {
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
     } finally {
+      loadingRef.current = false;
       setLoading(false);
+      setPrimeiraCargaConcluida(true);
     }
   };
 
   const handleBuscar = async (filtros: FiltrosBusca) => {
     try {
+      loadingRef.current = true;
       setLoading(true);
       setIsSearching(true);
       filtrosAtivosRef.current = filtros;
@@ -89,6 +95,7 @@ export default function Home() {
     } catch (error) {
       console.error('Failed to search reviews:', error);
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
   };
@@ -99,7 +106,7 @@ export default function Home() {
   };
 
   const carregarMais = async () => {
-    if (carregandoRef.current || !temMaisRef.current) return;
+    if (carregandoRef.current || !temMaisRef.current || loadingRef.current) return;
 
     carregandoRef.current = true;
     setCarregandoMais(true);
@@ -194,6 +201,10 @@ export default function Home() {
       console.error('Failed to rate review:', error);
     }
   };
+
+  if (loading && !primeiraCargaConcluida) {
+    return <Spinner telaCheia label="Carregando resenhas..." />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

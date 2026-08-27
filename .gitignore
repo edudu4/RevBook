@@ -32,6 +32,9 @@ pnpm-debug.log*
 *.swo
 *~
 
+# Development
+.claude/
+
 # OS files
 .DS_Store
 Thumbs.db

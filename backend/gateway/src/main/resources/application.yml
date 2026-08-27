@@ -35,6 +35,10 @@ spring:
           uri: ${REVIEW_SERVICE_URL:http://localhost:8878}
           predicates:
             - Path=/books/**
+        - id: review-service-notifications
+          uri: ${REVIEW_SERVICE_URL:http://localhost:8878}
+          predicates:
+            - Path=/notifications/**
       globalcors:
         cors-configurations:
           "[/**]":

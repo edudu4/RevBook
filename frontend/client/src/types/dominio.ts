@@ -72,3 +72,14 @@ export interface FiltrosBusca {
   autor?: string;
   genero?: string;
 }
+
+export interface Notificacao {
+  id: number;
+  tipo: 'COMENTARIO' | 'AVALIACAO';
+  resenhaId: number;
+  tituloLivro: string;
+  nomeAtor: string;
+  avatarAtor?: string;
+  lida: boolean;
+  criadoEm: string;
+}

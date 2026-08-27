@@ -79,3 +79,14 @@ export interface UserStatsApi {
   userName?: string;
   userAvatar?: string;
 }
+
+export interface NotificationApi {
+  id: number;
+  type: 'COMENTARIO' | 'AVALIACAO';
+  reviewId: number;
+  bookTitle: string;
+  actorName: string;
+  actorAvatar?: string;
+  read: boolean;
+  createdAt: string;
+}

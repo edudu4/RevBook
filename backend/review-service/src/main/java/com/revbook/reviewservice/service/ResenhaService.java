@@ -3,6 +3,7 @@ package com.revbook.reviewservice.service;
 import com.revbook.reviewservice.domain.Avaliacao;
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
+import com.revbook.reviewservice.domain.TipoNotificacao;
 import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.AvaliacaoRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
@@ -23,12 +24,17 @@ public class ResenhaService {
     private final ResenhaRepository resenhaRepository;
     private final AvaliacaoRepository avaliacaoRepository;
     private final LivroService livroService;
+    private final NotificacaoService notificacaoService;
 
     public ResenhaService(
-            ResenhaRepository resenhaRepository, AvaliacaoRepository avaliacaoRepository, LivroService livroService) {
+            ResenhaRepository resenhaRepository,
+            AvaliacaoRepository avaliacaoRepository,
+            LivroService livroService,
+            NotificacaoService notificacaoService) {
         this.resenhaRepository = resenhaRepository;
         this.avaliacaoRepository = avaliacaoRepository;
         this.livroService = livroService;
+        this.notificacaoService = notificacaoService;
     }
 
     public Resenha criar(String googleBooksId, String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
@@ -60,7 +66,8 @@ public class ResenhaService {
                 .getContent();
     }
 
-    public Avaliacao avaliar(Long resenhaId, Long usuarioId, Integer valor) {
+    public Avaliacao avaliar(
+            Long resenhaId, Long usuarioId, Integer valor, String nomeUsuario, String avatarUsuario) {
         if (valor == null || valor < 1 || valor > 5) {
             throw new IllegalArgumentException("A avaliação deve ser um valor entre 1 e 5 estrelas");
         }
@@ -73,6 +80,7 @@ public class ResenhaService {
         } else {
             Resenha resenha = buscarPorId(resenhaId);
             avaliacao = new Avaliacao(usuarioId, valor, resenha);
+            notificacaoService.notificar(TipoNotificacao.AVALIACAO, resenha, usuarioId, nomeUsuario, avatarUsuario);
         }
 
         return avaliacaoRepository.save(avaliacao);

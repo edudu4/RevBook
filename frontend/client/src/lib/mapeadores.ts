@@ -2,6 +2,7 @@ import type {
   BookSearchResultApi,
   CommentApi,
   CommentWithReviewApi,
+  NotificationApi,
   ReactionApi,
   ReviewApi,
   UserApi,
@@ -12,6 +13,7 @@ import type {
   ComentarioComResenha,
   EstatisticasUsuario,
   LivroEncontrado,
+  Notificacao,
   Reacao,
   Resenha,
   Usuario,
@@ -89,5 +91,18 @@ export function paraEstatisticas(api: UserStatsApi): EstatisticasUsuario {
     totalAvaliacoesRecebidas: api.totalRatingsReceived,
     nomeUsuario: api.userName,
     avatarUsuario: api.userAvatar,
+  };
+}
+
+export function paraNotificacao(api: NotificationApi): Notificacao {
+  return {
+    id: api.id,
+    tipo: api.type,
+    resenhaId: api.reviewId,
+    tituloLivro: api.bookTitle,
+    nomeAtor: api.actorName,
+    avatarAtor: api.actorAvatar,
+    lida: api.read,
+    criadoEm: api.createdAt,
   };
 }

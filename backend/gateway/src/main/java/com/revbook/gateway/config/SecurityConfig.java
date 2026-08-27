@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/comments/*").authenticated()
                         .pathMatchers(HttpMethod.POST, "/comments/*/reactions").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/reactions/*").authenticated()
+                        .pathMatchers("/notifications/**").authenticated()
                         .anyExchange().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenConverter(cookieBearerTokenConverter)

@@ -31,6 +31,9 @@ class ComentarioServiceTest {
     @Mock
     private ResenhaRepository resenhaRepository;
 
+    @Mock
+    private NotificacaoService notificacaoService;
+
     @InjectMocks
     private ComentarioService comentarioService;
 

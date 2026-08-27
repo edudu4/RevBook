@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Footer from '@/components/Footer';
+import NotificationBell from '@/components/NotificationBell';
 import Spinner from '@/components/Spinner';
 import SearchBar from '@/components/SearchBar';
 import BuscaLivro from '@/components/BuscaLivro';
@@ -235,6 +236,7 @@ export default function Home() {
                 <span className="hidden sm:inline">Nova Resenha</span>
               </Button>
               <div className="flex items-center gap-2 sm:gap-3 border-l border-border pl-2 sm:pl-4">
+                <NotificationBell />
                 <span className="hidden sm:inline text-sm text-muted-foreground">{user?.nome}</span>
                 <Button
                   onClick={() => setLocation('/profile')}

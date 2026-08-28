@@ -39,6 +39,13 @@ spring:
           uri: ${REVIEW_SERVICE_URL:http://localhost:8878}
           predicates:
             - Path=/notifications/**
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
 
 revbook:
   jwt:

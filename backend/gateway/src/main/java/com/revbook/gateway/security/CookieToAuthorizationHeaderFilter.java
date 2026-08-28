@@ -26,7 +26,7 @@ public class CookieToAuthorizationHeaderFilter implements GlobalFilter, Ordered 
         }
 
         ServerHttpRequest mutado = request.mutate()
-                .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + cookie.getValue()))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + cookie.getValue())
                 .build();
         return chain.filter(exchange.mutate().request(mutado).build());
     }

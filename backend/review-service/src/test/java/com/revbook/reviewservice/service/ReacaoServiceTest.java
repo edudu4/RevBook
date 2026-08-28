@@ -36,7 +36,7 @@ class ReacaoServiceTest {
     private ReacaoService reacaoService;
 
     private Comentario comentarioComId(long id) {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenha = new Resenha(livro, "Conteúdo", 1L, "Fulano", null);
         Comentario comentario = new Comentario("Comentário", 1L, "Fulano", null, resenha);
         ReflectionTestUtils.setField(comentario, "id", id);

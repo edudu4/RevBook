@@ -38,7 +38,7 @@ public class LivroService {
 
         return livroRepository.save(new Livro(
                 livroReal.googleBooksId(), livroReal.titulo(), livroReal.autor(),
-                livroReal.genero(), livroReal.capaUrl()));
+                livroReal.genero(), livroReal.capaUrl(), livroReal.sinopse()));
     }
 
     @Transactional(readOnly = true)

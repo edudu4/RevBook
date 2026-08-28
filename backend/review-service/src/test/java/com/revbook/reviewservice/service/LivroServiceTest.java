@@ -34,7 +34,7 @@ class LivroServiceTest {
 
     @Test
     void buscarNaGoogleBooks_deveDelegarParaOClient() {
-        var esperado = List.of(new LivroEncontrado("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null));
+        var esperado = List.of(new LivroEncontrado("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null));
         when(googleBooksClient.buscar("dom casmurro")).thenReturn(esperado);
 
         var resultado = livroService.buscarNaGoogleBooks("dom casmurro");
@@ -44,7 +44,7 @@ class LivroServiceTest {
 
     @Test
     void buscarOuCriar_deveReaproveitarLivroExistente_semSalvarDeNovo() {
-        Livro existente = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro existente = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         when(livroRepository.findByGoogleBooksId("gb-1")).thenReturn(Optional.of(existente));
 
         Livro resultado = livroService.buscarOuCriar("gb-1");
@@ -57,7 +57,8 @@ class LivroServiceTest {
     void buscarOuCriar_deveCriarNovoLivro_quandoGoogleConfirmaQueExiste() {
         when(livroRepository.findByGoogleBooksId("gb-2")).thenReturn(Optional.empty());
         when(googleBooksClient.buscarPorId("gb-2")).thenReturn(Optional.of(
-                new LivroEncontrado("gb-2", "Grande Sertão: Veredas", "Guimarães Rosa", "Regionalismo", "https://capa")));
+                new LivroEncontrado(
+                        "gb-2", "Grande Sertão: Veredas", "Guimarães Rosa", "Regionalismo", "https://capa", null)));
         when(livroRepository.save(any(Livro.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Livro resultado = livroService.buscarOuCriar("gb-2");

@@ -9,6 +9,7 @@ import com.revbook.reviewservice.repository.ResenhaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,9 @@ public class ComentarioService {
     private final ComentarioRepository comentarioRepository;
     private final ResenhaRepository resenhaRepository;
     private final NotificacaoService notificacaoService;
+
+    @Value("${revbook.moderador.email:}")
+    private String emailModerador;
 
     public ComentarioService(
             ComentarioRepository comentarioRepository,
@@ -51,23 +55,28 @@ public class ComentarioService {
         return comentarioRepository.findByUsuarioIdOrderByCriadoEmDesc(usuarioId);
     }
 
-    public void excluir(Long comentarioId, Long usuarioId) {
-        Comentario comentario = buscarDoUsuario(comentarioId, usuarioId);
+    public void excluir(Long comentarioId, Long usuarioId, String emailSolicitante) {
+        Comentario comentario = buscarDoUsuario(comentarioId, usuarioId, emailSolicitante);
         comentarioRepository.delete(comentario);
     }
 
-    public Comentario atualizar(Long comentarioId, Long usuarioId, String conteudo) {
-        Comentario comentario = buscarDoUsuario(comentarioId, usuarioId);
+    public Comentario atualizar(Long comentarioId, Long usuarioId, String emailSolicitante, String conteudo) {
+        Comentario comentario = buscarDoUsuario(comentarioId, usuarioId, emailSolicitante);
         comentario.setConteudo(conteudo);
         comentario.setAtualizadoEm(LocalDateTime.now());
         return comentarioRepository.save(comentario);
     }
 
-    private Comentario buscarDoUsuario(Long comentarioId, Long usuarioId) {
+    private boolean ehModerador(String email) {
+        return email != null && emailModerador != null && !emailModerador.isBlank()
+                && emailModerador.equalsIgnoreCase(email);
+    }
+
+    private Comentario buscarDoUsuario(Long comentarioId, Long usuarioId, String emailSolicitante) {
         Comentario comentario = comentarioRepository.findById(comentarioId)
                 .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
 
-        if (!comentario.getUsuarioId().equals(usuarioId)) {
+        if (!comentario.getUsuarioId().equals(usuarioId) && !ehModerador(emailSolicitante)) {
             throw new NaoAutorizadoException("Usuário não autorizado a alterar este comentário");
         }
 

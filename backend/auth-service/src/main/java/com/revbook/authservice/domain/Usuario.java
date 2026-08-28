@@ -20,6 +20,7 @@ public class Usuario {
 
     private String googleId;
 
+    @Column(columnDefinition = "text")
     private String avatar;
 
     protected Usuario() {

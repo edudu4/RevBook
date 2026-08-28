@@ -14,6 +14,8 @@ import com.revbook.authservice.dto.LoginResponse;
 import com.revbook.authservice.repository.UsuarioRepository;
 import com.revbook.authservice.security.GoogleTokenService;
 import com.revbook.authservice.security.JwtService;
+import com.revbook.authservice.security.RefreshTokenInvalidoException;
+import com.revbook.authservice.security.RefreshTokenService;
 import com.revbook.authservice.security.TokenGoogleInvalidoException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,9 @@ class AuthServiceTest {
 
     @Mock
     private GoogleTokenService googleTokenService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private AuthService authService;
@@ -86,5 +91,47 @@ class AuthServiceTest {
                 .isInstanceOf(TokenGoogleInvalidoException.class);
 
         verifyNoInteractions(usuarioRepository, jwtService);
+    }
+
+    @Test
+    void renovar_deveGerarNovoAccessTokenERefreshToken_quandoRefreshTokenValido() {
+        Usuario usuario = new Usuario("dono@example.com", "Dono", "google-3", "https://avatar/3");
+        ReflectionTestUtils.setField(usuario, "id", 7L);
+
+        when(refreshTokenService.validarERotacionar("refresh-valido")).thenReturn(7L);
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+        when(jwtService.gerarToken(usuario)).thenReturn("jwt-renovado");
+        when(refreshTokenService.gerar(7L)).thenReturn("refresh-novo");
+
+        LoginResponse resposta = authService.renovar("refresh-valido");
+
+        assertThat(resposta.accessToken()).isEqualTo("jwt-renovado");
+        assertThat(resposta.refreshToken()).isEqualTo("refresh-novo");
+        assertThat(resposta.user().id()).isEqualTo(7L);
+    }
+
+    @Test
+    void renovar_devePropagarExcecao_quandoRefreshTokenInvalido() {
+        when(refreshTokenService.validarERotacionar("refresh-invalido"))
+                .thenThrow(new RefreshTokenInvalidoException("Refresh token inválido"));
+
+        assertThatThrownBy(() -> authService.renovar("refresh-invalido"))
+                .isInstanceOf(RefreshTokenInvalidoException.class);
+
+        verifyNoInteractions(usuarioRepository, jwtService);
+    }
+
+    @Test
+    void logout_deveRevogarRefreshToken_quandoPresente() {
+        authService.logout("refresh-ativo");
+
+        verify(refreshTokenService).revogar("refresh-ativo");
+    }
+
+    @Test
+    void logout_naoDeveChamarRevogar_quandoRefreshTokenAusente() {
+        authService.logout(null);
+
+        verify(refreshTokenService, never()).revogar(any());
     }
 }

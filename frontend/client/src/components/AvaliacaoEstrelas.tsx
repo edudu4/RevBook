@@ -10,7 +10,15 @@ interface AvaliacaoEstrelasProps {
 
 export default function AvaliacaoEstrelas({ media, total, interativo, onAvaliar }: AvaliacaoEstrelasProps) {
   const [hover, setHover] = useState<number | null>(null);
+  const [brilhando, setBrilhando] = useState<number | null>(null);
   const exibido = hover ?? Math.round(media);
+
+  const lidarClique = (n: number) => {
+    if (!interativo) return;
+    onAvaliar?.(n);
+    setBrilhando(n);
+    setTimeout(() => setBrilhando(null), 500);
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -21,14 +29,14 @@ export default function AvaliacaoEstrelas({ media, total, interativo, onAvaliar 
             type="button"
             disabled={!interativo}
             onMouseEnter={() => interativo && setHover(n)}
-            onClick={() => interativo && onAvaliar?.(n)}
+            onClick={() => lidarClique(n)}
             className={interativo ? 'cursor-pointer' : 'cursor-default'}
             title={interativo ? `Avaliar com ${n} estrela${n > 1 ? 's' : ''}` : undefined}
           >
             <Star
               className={`w-4 h-4 transition-colors ${
-                n <= exibido ? 'fill-star text-star' : 'text-muted-foreground'
-              }`}
+                brilhando !== null && n <= brilhando ? 'estrela-brilhando' : ''
+              } ${n <= exibido ? 'fill-star text-star' : 'text-muted-foreground'}`}
             />
           </button>
         ))}

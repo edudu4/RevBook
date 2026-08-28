@@ -41,6 +41,7 @@ export interface Resenha {
   autor: string;
   genero?: string;
   capaUrl?: string;
+  sinopse?: string;
   conteudo: string;
   usuarioId: number;
   nomeUsuario: string;
@@ -57,6 +58,7 @@ export interface LivroEncontrado {
   autor: string;
   genero?: string;
   capaUrl?: string;
+  sinopse?: string;
 }
 
 export interface EstatisticasUsuario {

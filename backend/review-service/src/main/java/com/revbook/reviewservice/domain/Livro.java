@@ -28,15 +28,19 @@ public class Livro {
     @Column(columnDefinition = "text")
     private String capaUrl;
 
+    @Column(columnDefinition = "text")
+    private String sinopse;
+
     protected Livro() {
     }
 
-    public Livro(String googleBooksId, String titulo, String autor, String genero, String capaUrl) {
+    public Livro(String googleBooksId, String titulo, String autor, String genero, String capaUrl, String sinopse) {
         this.googleBooksId = googleBooksId;
         this.titulo = titulo;
         this.autor = autor;
         this.genero = genero;
         this.capaUrl = capaUrl;
+        this.sinopse = sinopse;
     }
 
     public Long getId() {
@@ -61,5 +65,9 @@ public class Livro {
 
     public String getCapaUrl() {
         return capaUrl;
+    }
+
+    public String getSinopse() {
+        return sinopse;
     }
 }

@@ -233,3 +233,19 @@
 @keyframes spinner-girar {
   to { transform: rotate(360deg); }
 }
+
+@keyframes estrela-brilho {
+  0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+  40% { transform: scale(1.4); filter: drop-shadow(0 0 6px var(--star)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+}
+
+.estrela-brilhando {
+  animation: estrela-brilho 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estrela-brilhando {
+    animation: none;
+  }
+}

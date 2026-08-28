@@ -33,7 +33,7 @@ class NotificacaoServiceTest {
     private NotificacaoService notificacaoService;
 
     private Resenha resenhaDoUsuario(long donoId) {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenha = new Resenha(livro, "Conteúdo", donoId, "Dono", null);
         ReflectionTestUtils.setField(resenha, "id", 1L);
         return resenha;

@@ -167,9 +167,8 @@ export default function Home() {
         content: conteudoResenha,
       };
 
-      const response = await fetch(`${API_BASE_URL}/reviews`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -196,15 +195,19 @@ export default function Home() {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/reviews/rate`, {
+      await fetchAutenticado(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ reviewId: resenhaId, value: valor }),
       });
-      buscarResenhas();
+      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`);
+      if (response.ok) {
+        const data: ReviewApi = await response.json();
+        const atualizada = paraResenha(data);
+        setResenhas((atual) => atual.map((r) => (r.id === resenhaId ? atualizada : r)));
+      }
     } catch (error) {
       console.error('Failed to rate review:', error);
     }
@@ -327,7 +330,7 @@ export default function Home() {
                   <CapaLivro
                     src={resenha.capaUrl}
                     alt={resenha.titulo}
-                    className="w-16 h-24 object-cover rounded flex-shrink-0"
+                    className="w-24 h-36 object-cover rounded flex-shrink-0"
                   />
                   <div className="min-w-0">
                     <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-1">
@@ -364,7 +367,7 @@ export default function Home() {
                 </span>
               </div>
 
-              <p className="text-foreground leading-relaxed mb-4 line-clamp-3">
+              <p className="text-foreground leading-relaxed mb-4 line-clamp-3 font-medium">
                 {resenha.conteudo}
               </p>
 
@@ -428,6 +431,17 @@ export default function Home() {
                   onLimpar={() => setLivroSelecionado(null)}
                 />
               </div>
+
+              {livroSelecionado?.sinopse && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Sinopse
+                  </label>
+                  <p className="w-full px-4 py-2 border border-border rounded-lg bg-muted text-muted-foreground text-sm max-h-32 overflow-y-auto">
+                    {livroSelecionado.sinopse}
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">

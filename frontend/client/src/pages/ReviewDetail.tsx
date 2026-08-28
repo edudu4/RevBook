@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import Spinner from '@/components/Spinner';
 import { ArrowLeft, Edit2, Trash2, Check, X } from 'lucide-react';
 import { API_BASE_URL, type ReviewApi } from '@/lib/api';
+import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraResenha } from '@/lib/mapeadores';
 import { preloadImagens } from '@/lib/preloadImagens';
 import type { Resenha } from '@/types/dominio';
@@ -23,8 +24,18 @@ export default function ReviewDetail() {
   const [naoEncontrada, setNaoEncontrada] = useState(false);
   const [editando, setEditando] = useState(false);
   const [conteudoEdicao, setConteudoEdicao] = useState('');
+  const [zoomAberto, setZoomAberto] = useState(false);
 
   const resenhaId = params?.id;
+
+  useEffect(() => {
+    if (!zoomAberto) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setZoomAberto(false);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [zoomAberto]);
 
   useEffect(() => {
     if (resenhaId) {
@@ -32,24 +43,26 @@ export default function ReviewDetail() {
     }
   }, [resenhaId]);
 
-  const buscarResenha = async (id: string) => {
+  const buscarResenha = async (id: string, mostrarCarregando = true) => {
     try {
-      setLoading(true);
-      setNaoEncontrada(false);
+      if (mostrarCarregando) {
+        setLoading(true);
+        setNaoEncontrada(false);
+      }
       const response = await fetch(`${API_BASE_URL}/reviews/${id}`);
       if (response.ok) {
         const data: ReviewApi = await response.json();
         const mapeada = paraResenha(data);
         await preloadImagens([mapeada.capaUrl, mapeada.avatarUsuario]);
         setResenha(mapeada);
-      } else {
+      } else if (mostrarCarregando) {
         setNaoEncontrada(true);
       }
     } catch (error) {
       console.error('Failed to fetch review:', error);
-      setNaoEncontrada(true);
+      if (mostrarCarregando) setNaoEncontrada(true);
     } finally {
-      setLoading(false);
+      if (mostrarCarregando) setLoading(false);
     }
   };
 
@@ -60,15 +73,14 @@ export default function ReviewDetail() {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/reviews/rate`, {
+      await fetchAutenticado(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ reviewId: Number(resenhaId), value: valor }),
       });
-      buscarResenha(resenhaId);
+      buscarResenha(resenhaId, false);
     } catch (error) {
       console.error('Failed to rate review:', error);
     }
@@ -78,9 +90,8 @@ export default function ReviewDetail() {
     if (!isAuthenticated || !resenhaId || !conteudoEdicao.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'PUT',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -89,7 +100,7 @@ export default function ReviewDetail() {
 
       if (response.ok) {
         setEditando(false);
-        buscarResenha(resenhaId);
+        buscarResenha(resenhaId, false);
       }
     } catch (error) {
       console.error('Failed to update review:', error);
@@ -101,9 +112,8 @@ export default function ReviewDetail() {
     if (!confirm('Tem certeza que deseja excluir esta resenha? Essa ação não pode ser desfeita.')) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       if (response.ok) {
@@ -138,7 +148,7 @@ export default function ReviewDetail() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="bg-card border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-6 flex items-center gap-4">
+        <div className="max-w-[58rem] mx-auto px-4 py-6 flex items-center gap-4">
           <Button onClick={() => setLocation('/')} variant="ghost" size="sm">
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -146,15 +156,22 @@ export default function ReviewDetail() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+      <main className="max-w-[58rem] mx-auto px-4 py-8 sm:py-12">
         <article className="bg-card border border-border rounded-lg p-4 sm:p-8">
           <div className="flex gap-4 sm:gap-6 mb-6">
-            <CapaLivro
-              src={resenha.capaUrl}
-              alt={resenha.titulo}
-              loading="eager"
-              className="w-20 h-28 sm:w-24 sm:h-36 object-cover rounded flex-shrink-0"
-            />
+            <button
+              type="button"
+              onClick={() => resenha.capaUrl && setZoomAberto(true)}
+              className={`flex-shrink-0 ${resenha.capaUrl ? 'cursor-zoom-in' : 'cursor-default'}`}
+              title={resenha.capaUrl ? 'Ampliar capa' : undefined}
+            >
+              <CapaLivro
+                src={resenha.capaUrl}
+                alt={resenha.titulo}
+                loading="eager"
+                className="w-28 h-40 sm:w-36 sm:h-52 object-cover rounded"
+              />
+            </button>
             <div className="min-w-0">
               <h2 className="text-xl sm:text-3xl font-bold text-foreground mb-2">{resenha.titulo}</h2>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-muted-foreground mb-3">
@@ -171,6 +188,15 @@ export default function ReviewDetail() {
               />
             </div>
           </div>
+
+          {resenha.sinopse && (
+            <div className="mb-6 p-4 rounded-lg bg-muted">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                Sinopse
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{resenha.sinopse}</p>
+            </div>
+          )}
 
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
             <div
@@ -233,12 +259,34 @@ export default function ReviewDetail() {
               </div>
             </div>
           ) : (
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap min-h-[8rem]">{resenha.conteudo}</p>
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap min-h-[8rem] text-lg font-medium">{resenha.conteudo}</p>
           )}
 
           <CommentsSection resenhaId={resenha.id} />
         </article>
       </main>
+
+      {zoomAberto && resenha.capaUrl && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setZoomAberto(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setZoomAberto(false)}
+            className="absolute top-4 right-4 text-white/80 hover:text-white"
+            title="Fechar"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={resenha.capaUrl}
+            alt={resenha.titulo}
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <Footer />
     </div>

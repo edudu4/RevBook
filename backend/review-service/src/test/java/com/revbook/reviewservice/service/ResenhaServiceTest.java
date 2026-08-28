@@ -46,7 +46,7 @@ class ResenhaServiceTest {
     private ResenhaService resenhaService;
 
     private Resenha novaResenhaComId(long id) {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenha = new Resenha(livro, "Excelente livro.", 1L, "Fulano", null);
         ReflectionTestUtils.setField(resenha, "id", id);
         return resenha;
@@ -54,7 +54,7 @@ class ResenhaServiceTest {
 
     @Test
     void criar_deveReaproveitarOuCriarLivroEEntaoSalvarResenha() {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         when(livroService.buscarOuCriar("gb-1")).thenReturn(livro);
         when(resenhaRepository.save(any(Resenha.class))).thenAnswer(inv -> inv.getArgument(0));
 

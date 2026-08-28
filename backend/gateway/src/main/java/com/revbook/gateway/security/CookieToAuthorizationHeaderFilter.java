@@ -6,6 +6,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -25,10 +26,18 @@ public class CookieToAuthorizationHeaderFilter implements GlobalFilter, Ordered 
             return chain.filter(exchange);
         }
 
-        ServerHttpRequest mutado = request.mutate()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + cookie.getValue())
-                .build();
-        return chain.filter(exchange.mutate().request(mutado).build());
+        HttpHeaders novosHeaders = new HttpHeaders();
+        novosHeaders.putAll(request.getHeaders());
+        novosHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + cookie.getValue());
+
+        ServerHttpRequest requestDecorado = new ServerHttpRequestDecorator(request) {
+            @Override
+            public HttpHeaders getHeaders() {
+                return novosHeaders;
+            }
+        };
+
+        return chain.filter(exchange.mutate().request(requestDecorado).build());
     }
 
     @Override

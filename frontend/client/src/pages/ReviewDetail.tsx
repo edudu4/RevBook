@@ -147,7 +147,7 @@ export default function ReviewDetail() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        <article className="bg-card border border-border rounded-lg p-4 sm:p-8 min-h-[26rem] min-w-full">
+        <article className="bg-card border border-border rounded-lg p-4 sm:p-8">
           <div className="flex gap-4 sm:gap-6 mb-6">
             <CapaLivro
               src={resenha.capaUrl}
@@ -233,7 +233,7 @@ export default function ReviewDetail() {
               </div>
             </div>
           ) : (
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap">{resenha.conteudo}</p>
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap min-h-[8rem]">{resenha.conteudo}</p>
           )}
 
           <CommentsSection resenhaId={resenha.id} />

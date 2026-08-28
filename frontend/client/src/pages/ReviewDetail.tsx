@@ -142,6 +142,7 @@ export default function ReviewDetail() {
   const media = resenha.avaliacoes.length
     ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
     : 0;
+  const avaliacaoDoUsuario = resenha.avaliacoes.find((a) => a.usuarioId === user?.id)?.valor;
   const ehModerador = user?.email?.toLowerCase() === 'eduardoa8142@gmail.com';
   const podeGerenciar = isAuthenticated && (user?.id === resenha.usuarioId || ehModerador);
 
@@ -183,6 +184,7 @@ export default function ReviewDetail() {
               <AvaliacaoEstrelas
                 media={media}
                 total={resenha.avaliacoes.length}
+                avaliacaoUsuario={avaliacaoDoUsuario}
                 interativo={isAuthenticated}
                 onAvaliar={handleAvaliar}
               />

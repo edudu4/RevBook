@@ -383,6 +383,7 @@ export default function Home() {
                         : 0
                     }
                     total={resenha.avaliacoes.length}
+                    avaliacaoUsuario={resenha.avaliacoes.find((a) => a.usuarioId === user?.id)?.valor}
                     interativo={isAuthenticated}
                     onAvaliar={(valor) => handleAvaliarResenha(resenha.id, valor)}
                   />

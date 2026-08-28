@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/comments/*").authenticated()
                         .pathMatchers(HttpMethod.POST, "/comments/*/reactions").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/reactions/*").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/books/backfill-sinopse").authenticated()
                         .pathMatchers("/notifications/**").authenticated()
                         .anyExchange().permitAll())
                 .exceptionHandling(handling -> handling

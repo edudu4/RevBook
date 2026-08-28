@@ -12,4 +12,6 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     @Query("select distinct l.genero from Livro l where l.genero is not null and l.genero <> ''")
     List<String> listarGenerosDistintos();
+
+    List<Livro> findBySinopseIsNull();
 }

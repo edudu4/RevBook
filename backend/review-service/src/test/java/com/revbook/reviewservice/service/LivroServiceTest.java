@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.exception.LivroInvalidoException;
+import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.googlebooks.GoogleBooksClient;
 import com.revbook.reviewservice.googlebooks.LivroEncontrado;
 import com.revbook.reviewservice.repository.LivroRepository;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class LivroServiceTest {
@@ -86,5 +88,35 @@ class LivroServiceTest {
         var resultado = livroService.listarGeneros();
 
         assertThat(resultado).containsExactly("Aventura", "Ficção", "Romance");
+    }
+
+    @Test
+    void atualizarSinopsesFaltantes_deveLancarExcecao_quandoNaoEhModerador() {
+        ReflectionTestUtils.setField(livroService, "emailModerador", "mod@revbook.com.br");
+
+        assertThatThrownBy(() -> livroService.atualizarSinopsesFaltantes("outro@teste.com"))
+                .isInstanceOf(NaoAutorizadoException.class);
+
+        verify(livroRepository, never()).findBySinopseIsNull();
+    }
+
+    @Test
+    void atualizarSinopsesFaltantes_deveAtualizarApenasLivrosComSinopseEncontrada() {
+        ReflectionTestUtils.setField(livroService, "emailModerador", "mod@revbook.com.br");
+
+        Livro semSinopse1 = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
+        Livro semSinopse2 = new Livro("gb-2", "O Alienista", "Machado de Assis", "Conto", null, null);
+        when(livroRepository.findBySinopseIsNull()).thenReturn(List.of(semSinopse1, semSinopse2));
+        when(googleBooksClient.buscarPorId("gb-1")).thenReturn(Optional.of(
+                new LivroEncontrado("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, "Uma sinopse.")));
+        when(googleBooksClient.buscarPorId("gb-2")).thenReturn(Optional.empty());
+
+        int atualizados = livroService.atualizarSinopsesFaltantes("mod@revbook.com.br");
+
+        assertThat(atualizados).isEqualTo(1);
+        assertThat(semSinopse1.getSinopse()).isEqualTo("Uma sinopse.");
+        assertThat(semSinopse2.getSinopse()).isNull();
+        verify(livroRepository).save(semSinopse1);
+        verify(livroRepository, never()).save(semSinopse2);
     }
 }

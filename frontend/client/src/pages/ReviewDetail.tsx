@@ -132,7 +132,8 @@ export default function ReviewDetail() {
   const media = resenha.avaliacoes.length
     ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
     : 0;
-  const ehDono = isAuthenticated && user?.id === resenha.usuarioId;
+  const ehModerador = user?.email?.toLowerCase() === 'eduardoa8142@gmail.com';
+  const podeGerenciar = isAuthenticated && (user?.id === resenha.usuarioId || ehModerador);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -189,7 +190,7 @@ export default function ReviewDetail() {
               </div>
             </div>
 
-            {ehDono && !editando && (
+            {podeGerenciar && !editando && (
               <div className="flex gap-1">
                 <button
                   onClick={() => {

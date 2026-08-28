@@ -42,6 +42,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_BOOKS: ${GOOGLE_BOOKS}
+      MODERATOR_EMAIL: ${MODERATOR_EMAIL}
 
   gateway:
     image: ghcr.io/${GHCR_OWNER}/revbook-gateway:latest

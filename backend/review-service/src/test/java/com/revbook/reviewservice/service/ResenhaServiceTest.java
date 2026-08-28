@@ -141,7 +141,7 @@ class ResenhaServiceTest {
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
         when(resenhaRepository.save(any(Resenha.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Resenha resultado = resenhaService.atualizar(1L, 1L, "Conteúdo revisado");
+        Resenha resultado = resenhaService.atualizar(1L, 1L, "dono@teste.com", "Conteúdo revisado");
 
         assertThat(resultado.getConteudo()).isEqualTo("Conteúdo revisado");
         assertThat(resultado.getAtualizadoEm()).isNotNull();
@@ -152,10 +152,22 @@ class ResenhaServiceTest {
         Resenha resenha = novaResenhaComId(1L);
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
 
-        assertThatThrownBy(() -> resenhaService.atualizar(1L, 999L, "Tentativa indevida"))
+        assertThatThrownBy(() -> resenhaService.atualizar(1L, 999L, "outro@teste.com", "Tentativa indevida"))
                 .isInstanceOf(NaoAutorizadoException.class);
 
         verify(resenhaRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizar_devePermitir_quandoUsuarioEhModerador() {
+        Resenha resenha = novaResenhaComId(1L);
+        ReflectionTestUtils.setField(resenhaService, "emailModerador", "mod@revbook.com.br");
+        when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
+        when(resenhaRepository.save(any(Resenha.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Resenha resultado = resenhaService.atualizar(1L, 999L, "MOD@revbook.com.br", "Editado pelo moderador");
+
+        assertThat(resultado.getConteudo()).isEqualTo("Editado pelo moderador");
     }
 
     @Test
@@ -163,7 +175,7 @@ class ResenhaServiceTest {
         Resenha resenha = novaResenhaComId(1L);
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
 
-        resenhaService.excluir(1L, 1L);
+        resenhaService.excluir(1L, 1L, "dono@teste.com");
 
         verify(resenhaRepository).delete(resenha);
     }
@@ -173,9 +185,20 @@ class ResenhaServiceTest {
         Resenha resenha = novaResenhaComId(1L);
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
 
-        assertThatThrownBy(() -> resenhaService.excluir(1L, 999L))
+        assertThatThrownBy(() -> resenhaService.excluir(1L, 999L, "outro@teste.com"))
                 .isInstanceOf(NaoAutorizadoException.class);
 
         verify(resenhaRepository, never()).delete(any(Resenha.class));
+    }
+
+    @Test
+    void excluir_devePermitir_quandoUsuarioEhModerador() {
+        Resenha resenha = novaResenhaComId(1L);
+        ReflectionTestUtils.setField(resenhaService, "emailModerador", "mod@revbook.com.br");
+        when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
+
+        resenhaService.excluir(1L, 999L, "mod@revbook.com.br");
+
+        verify(resenhaRepository).delete(resenha);
     }
 }

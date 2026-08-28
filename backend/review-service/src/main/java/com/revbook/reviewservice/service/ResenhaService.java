@@ -11,6 +11,7 @@ import com.revbook.reviewservice.repository.ResenhaSpecifications;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,9 @@ public class ResenhaService {
     private final AvaliacaoRepository avaliacaoRepository;
     private final LivroService livroService;
     private final NotificacaoService notificacaoService;
+
+    @Value("${revbook.moderador.email:}")
+    private String emailModerador;
 
     public ResenhaService(
             ResenhaRepository resenhaRepository,
@@ -85,22 +89,27 @@ public class ResenhaService {
         return avaliacaoRepository.save(avaliacao);
     }
 
-    public Resenha atualizar(Long resenhaId, Long usuarioId, String conteudo) {
-        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId);
+    public Resenha atualizar(Long resenhaId, Long usuarioId, String emailSolicitante, String conteudo) {
+        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId, emailSolicitante);
         resenha.setConteudo(conteudo);
         resenha.setAtualizadoEm(LocalDateTime.now());
         return resenhaRepository.save(resenha);
     }
 
-    public void excluir(Long resenhaId, Long usuarioId) {
-        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId);
+    public void excluir(Long resenhaId, Long usuarioId, String emailSolicitante) {
+        Resenha resenha = buscarDoUsuario(resenhaId, usuarioId, emailSolicitante);
         resenhaRepository.delete(resenha);
     }
 
-    private Resenha buscarDoUsuario(Long resenhaId, Long usuarioId) {
+    private boolean ehModerador(String email) {
+        return email != null && emailModerador != null && !emailModerador.isBlank()
+                && emailModerador.equalsIgnoreCase(email);
+    }
+
+    private Resenha buscarDoUsuario(Long resenhaId, Long usuarioId, String emailSolicitante) {
         Resenha resenha = buscarPorId(resenhaId);
 
-        if (!resenha.getUsuarioId().equals(usuarioId)) {
+        if (!resenha.getUsuarioId().equals(usuarioId) && !ehModerador(emailSolicitante)) {
             throw new NaoAutorizadoException("Usuário não autorizado a alterar esta resenha");
         }
 

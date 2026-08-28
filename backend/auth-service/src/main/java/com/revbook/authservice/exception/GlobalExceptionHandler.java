@@ -1,5 +1,6 @@
 package com.revbook.authservice.exception;
 
+import com.revbook.authservice.security.RefreshTokenInvalidoException;
 import com.revbook.authservice.security.TokenGoogleInvalidoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenGoogleInvalidoException.class)
     public ResponseEntity<String> tratarTokenInvalido(TokenGoogleInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(RefreshTokenInvalidoException.class)
+    public ResponseEntity<String> tratarRefreshTokenInvalido(RefreshTokenInvalidoException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 }

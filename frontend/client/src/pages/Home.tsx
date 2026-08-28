@@ -167,9 +167,8 @@ export default function Home() {
         content: conteudoResenha,
       };
 
-      const response = await fetch(`${API_BASE_URL}/reviews`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -196,9 +195,8 @@ export default function Home() {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/reviews/rate`, {
+      await fetchAutenticado(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -364,7 +362,7 @@ export default function Home() {
                 </span>
               </div>
 
-              <p className="text-foreground leading-relaxed mb-4 line-clamp-3">
+              <p className="text-foreground leading-relaxed mb-4 line-clamp-3 font-medium">
                 {resenha.conteudo}
               </p>
 

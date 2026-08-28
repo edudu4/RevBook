@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReactionPicker from './ReactionPicker';
 import { MessageSquare, Trash2, Edit2, Check, X, Smile } from 'lucide-react';
 import { API_BASE_URL, type CommentApi } from '@/lib/api';
+import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraComentario } from '@/lib/mapeadores';
 import type { Comentario } from '@/types/dominio';
 
@@ -47,9 +48,8 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}/comments`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews/${resenhaId}/comments`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -72,9 +72,8 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
     if (!isAuthenticated) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/comments/${comentarioId}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       if (response.ok) {
@@ -89,9 +88,8 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
     if (!isAuthenticated || !editContent.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/comments/${comentarioId}`, {
         method: 'PUT',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -112,9 +110,8 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
     if (!isAuthenticated) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/comments/${comentarioId}/reactions`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/comments/${comentarioId}/reactions`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -239,7 +236,7 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               ) : (
-                <p className="text-foreground leading-relaxed mb-3">{comentario.conteudo}</p>
+                <p className="text-foreground leading-relaxed mb-3 text-base font-medium">{comentario.conteudo}</p>
               )}
 
               {/* Reactions Section */}

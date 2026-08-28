@@ -29,6 +29,8 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       COOKIE_DOMAIN: .revbook.com.br
       COOKIE_SECURE: "true"
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-15}
+      REFRESH_EXPIRATION_DAYS: ${REFRESH_EXPIRATION_DAYS:-30}
 
   review-service:
     image: ghcr.io/${GHCR_OWNER}/revbook-review-service:latest

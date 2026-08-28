@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import Spinner from '@/components/Spinner';
 import { ArrowLeft, Edit2, Trash2, Check, X } from 'lucide-react';
 import { API_BASE_URL, type ReviewApi } from '@/lib/api';
+import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraResenha } from '@/lib/mapeadores';
 import { preloadImagens } from '@/lib/preloadImagens';
 import type { Resenha } from '@/types/dominio';
@@ -60,9 +61,8 @@ export default function ReviewDetail() {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/reviews/rate`, {
+      await fetchAutenticado(`${API_BASE_URL}/reviews/rate`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -78,9 +78,8 @@ export default function ReviewDetail() {
     if (!isAuthenticated || !resenhaId || !conteudoEdicao.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'PUT',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -101,9 +100,8 @@ export default function ReviewDetail() {
     if (!confirm('Tem certeza que deseja excluir esta resenha? Essa ação não pode ser desfeita.')) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`, {
+      const response = await fetchAutenticado(`${API_BASE_URL}/reviews/${resenhaId}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       if (response.ok) {
@@ -233,7 +231,7 @@ export default function ReviewDetail() {
               </div>
             </div>
           ) : (
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap min-h-[8rem]">{resenha.conteudo}</p>
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap min-h-[8rem] text-lg font-medium">{resenha.conteudo}</p>
           )}
 
           <CommentsSection resenhaId={resenha.id} />

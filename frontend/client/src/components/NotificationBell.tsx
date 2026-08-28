@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Bell, MessageSquare, Star } from 'lucide-react';
 import { API_BASE_URL, type NotificationApi } from '@/lib/api';
+import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraNotificacao } from '@/lib/mapeadores';
 import type { Notificacao } from '@/types/dominio';
 
@@ -28,7 +29,7 @@ export default function NotificationBell() {
 
   const buscarContagem = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/notifications/unread-count`, { credentials: 'include' });
+      const response = await fetchAutenticado(`${API_BASE_URL}/notifications/unread-count`);
       if (response.ok) {
         const data: { count: number } = await response.json();
         setNaoLidas(data.count);
@@ -62,7 +63,7 @@ export default function NotificationBell() {
     if (novoEstado) {
       setCarregando(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/notifications`, { credentials: 'include' });
+        const response = await fetchAutenticado(`${API_BASE_URL}/notifications`);
         if (response.ok) {
           const data: NotificationApi[] = await response.json();
           setNotificacoes(data.map(paraNotificacao));
@@ -81,9 +82,8 @@ export default function NotificationBell() {
 
     if (!notificacao.lida) {
       try {
-        await fetch(`${API_BASE_URL}/notifications/${notificacao.id}/read`, {
+        await fetchAutenticado(`${API_BASE_URL}/notifications/${notificacao.id}/read`, {
           method: 'POST',
-          credentials: 'include',
         });
         setNaoLidas((atual) => Math.max(0, atual - 1));
       } catch (error) {
@@ -94,7 +94,7 @@ export default function NotificationBell() {
 
   const marcarTodasComoLidas = async () => {
     try {
-      await fetch(`${API_BASE_URL}/notifications/read-all`, { method: 'POST', credentials: 'include' });
+      await fetchAutenticado(`${API_BASE_URL}/notifications/read-all`, { method: 'POST' });
       setNotificacoes((atual) => atual.map((n) => ({ ...n, lida: true })));
       setNaoLidas(0);
     } catch (error) {

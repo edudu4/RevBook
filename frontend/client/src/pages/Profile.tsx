@@ -208,7 +208,7 @@ export default function Profile() {
                     </span>
                   </div>
 
-                  <p className="text-foreground leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-foreground leading-relaxed mb-4 line-clamp-3 font-medium">
                     {resenha.conteudo}
                   </p>
 
@@ -262,7 +262,7 @@ export default function Profile() {
                     </p>
                   </div>
 
-                  <p className="text-foreground leading-relaxed mb-4">
+                  <p className="text-foreground leading-relaxed mb-4 font-medium">
                     {comentario.conteudo}
                   </p>
 

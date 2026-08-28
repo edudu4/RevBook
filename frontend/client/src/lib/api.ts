@@ -45,6 +45,7 @@ export interface ReviewApi {
   author: string;
   genre?: string;
   coverUrl?: string;
+  synopsis?: string;
   content: string;
   userId: number;
   userName: string;
@@ -61,6 +62,7 @@ export interface BookSearchResultApi {
   author: string;
   genre?: string;
   coverUrl?: string;
+  synopsis?: string;
 }
 
 export interface CreateReviewApiRequest {

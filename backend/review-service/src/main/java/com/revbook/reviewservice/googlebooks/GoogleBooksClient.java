@@ -99,7 +99,7 @@ public class GoogleBooksClient {
                 : null;
         String capaUrl = info.imageLinks() != null ? paraHttps(info.imageLinks().thumbnail()) : null;
 
-        return Optional.of(new LivroEncontrado(item.id(), info.title(), autor, genero, capaUrl));
+        return Optional.of(new LivroEncontrado(item.id(), info.title(), autor, genero, capaUrl, info.description()));
     }
 
     private String paraHttps(String url) {

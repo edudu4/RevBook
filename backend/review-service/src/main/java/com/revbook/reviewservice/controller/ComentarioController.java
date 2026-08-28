@@ -45,7 +45,7 @@ public class ComentarioController {
 
     @DeleteMapping("/comments/{commentId}")
     public void excluir(@PathVariable Long commentId, @UsuarioLogado UsuarioAutenticado usuario) {
-        comentarioService.excluir(commentId, usuario.id());
+        comentarioService.excluir(commentId, usuario.id(), usuario.email());
     }
 
     @PutMapping("/comments/{commentId}")
@@ -53,6 +53,7 @@ public class ComentarioController {
             @PathVariable Long commentId,
             @RequestBody CommentContentRequest dados,
             @UsuarioLogado UsuarioAutenticado usuario) {
-        return CommentResponse.de(comentarioService.atualizar(commentId, usuario.id(), dados.content()));
+        return CommentResponse.de(
+                comentarioService.atualizar(commentId, usuario.id(), usuario.email(), dados.content()));
     }
 }

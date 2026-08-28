@@ -63,6 +63,7 @@ export function paraResenha(api: ReviewApi): Resenha {
     autor: api.author,
     genero: api.genre,
     capaUrl: api.coverUrl,
+    sinopse: api.synopsis,
     conteudo: api.content,
     usuarioId: api.userId,
     nomeUsuario: api.userName,
@@ -81,6 +82,7 @@ export function paraLivroEncontrado(api: BookSearchResultApi): LivroEncontrado {
     autor: api.author,
     genero: api.genre,
     capaUrl: api.coverUrl,
+    sinopse: api.synopsis,
   };
 }
 

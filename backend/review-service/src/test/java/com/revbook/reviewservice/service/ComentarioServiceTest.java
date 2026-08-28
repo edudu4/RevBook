@@ -38,7 +38,7 @@ class ComentarioServiceTest {
     private ComentarioService comentarioService;
 
     private Resenha resenhaComId(long id) {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenha = new Resenha(livro, "Conteúdo", 1L, "Fulano", null);
         ReflectionTestUtils.setField(resenha, "id", id);
         return resenha;
@@ -79,7 +79,7 @@ class ComentarioServiceTest {
         Comentario comentario = comentarioComId(10L, 2L, resenha);
         when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentario));
 
-        assertThatThrownBy(() -> comentarioService.excluir(10L, 999L))
+        assertThatThrownBy(() -> comentarioService.excluir(10L, 999L, "outro@teste.com"))
                 .isInstanceOf(NaoAutorizadoException.class);
 
         verify(comentarioRepository, never()).delete(any());
@@ -91,7 +91,19 @@ class ComentarioServiceTest {
         Comentario comentario = comentarioComId(10L, 2L, resenha);
         when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentario));
 
-        comentarioService.excluir(10L, 2L);
+        comentarioService.excluir(10L, 2L, "dono@teste.com");
+
+        verify(comentarioRepository).delete(comentario);
+    }
+
+    @Test
+    void excluir_devePermitir_quandoUsuarioEhModerador() {
+        Resenha resenha = resenhaComId(1L);
+        Comentario comentario = comentarioComId(10L, 2L, resenha);
+        ReflectionTestUtils.setField(comentarioService, "emailModerador", "mod@revbook.com.br");
+        when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentario));
+
+        comentarioService.excluir(10L, 999L, "mod@revbook.com.br");
 
         verify(comentarioRepository).delete(comentario);
     }
@@ -103,7 +115,7 @@ class ComentarioServiceTest {
         when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentario));
         when(comentarioRepository.save(any(Comentario.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Comentario resultado = comentarioService.atualizar(10L, 2L, "Conteúdo editado");
+        Comentario resultado = comentarioService.atualizar(10L, 2L, "dono@teste.com", "Conteúdo editado");
 
         assertThat(resultado.getConteudo()).isEqualTo("Conteúdo editado");
         assertThat(resultado.getAtualizadoEm()).isNotNull();
@@ -115,7 +127,7 @@ class ComentarioServiceTest {
         Comentario comentario = comentarioComId(10L, 2L, resenha);
         when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentario));
 
-        assertThatThrownBy(() -> comentarioService.atualizar(10L, 999L, "Tentativa indevida"))
+        assertThatThrownBy(() -> comentarioService.atualizar(10L, 999L, "outro@teste.com", "Tentativa indevida"))
                 .isInstanceOf(NaoAutorizadoException.class);
     }
 }

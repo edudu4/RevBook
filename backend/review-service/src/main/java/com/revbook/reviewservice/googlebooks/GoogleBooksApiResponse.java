@@ -11,7 +11,8 @@ public record GoogleBooksApiResponse(List<Item> items) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record VolumeInfo(String title, List<String> authors, List<String> categories, ImageLinks imageLinks) {
+    public record VolumeInfo(
+            String title, List<String> authors, List<String> categories, String description, ImageLinks imageLinks) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

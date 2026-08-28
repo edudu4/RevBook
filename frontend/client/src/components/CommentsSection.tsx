@@ -18,6 +18,7 @@ interface CommentsSectionProps {
 export default function CommentsSection({ resenhaId, onComentarioAdicionado }: CommentsSectionProps) {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const ehModerador = user?.email?.toLowerCase() === 'eduardoa8142@gmail.com';
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [novoComentario, setNovoComentario] = useState('');
   const [loading, setLoading] = useState(false);
@@ -185,7 +186,7 @@ export default function CommentsSection({ resenhaId, onComentarioAdicionado }: C
                     </p>
                   </div>
                 </div>
-                {isAuthenticated && user?.id === comentario.usuarioId && (
+                {isAuthenticated && (user?.id === comentario.usuarioId || ehModerador) && (
                   <div className="flex gap-2">
                     {editingId === comentario.id ? (
                       <>

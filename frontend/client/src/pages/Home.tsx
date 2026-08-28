@@ -202,7 +202,12 @@ export default function Home() {
         },
         body: JSON.stringify({ reviewId: resenhaId, value: valor }),
       });
-      buscarResenhas();
+      const response = await fetch(`${API_BASE_URL}/reviews/${resenhaId}`);
+      if (response.ok) {
+        const data: ReviewApi = await response.json();
+        const atualizada = paraResenha(data);
+        setResenhas((atual) => atual.map((r) => (r.id === resenhaId ? atualizada : r)));
+      }
     } catch (error) {
       console.error('Failed to rate review:', error);
     }
@@ -325,7 +330,7 @@ export default function Home() {
                   <CapaLivro
                     src={resenha.capaUrl}
                     alt={resenha.titulo}
-                    className="w-16 h-24 object-cover rounded flex-shrink-0"
+                    className="w-24 h-36 object-cover rounded flex-shrink-0"
                   />
                   <div className="min-w-0">
                     <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-1">
@@ -426,6 +431,17 @@ export default function Home() {
                   onLimpar={() => setLivroSelecionado(null)}
                 />
               </div>
+
+              {livroSelecionado?.sinopse && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Sinopse
+                  </label>
+                  <p className="w-full px-4 py-2 border border-border rounded-lg bg-muted text-muted-foreground text-sm max-h-32 overflow-y-auto">
+                    {livroSelecionado.sinopse}
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">

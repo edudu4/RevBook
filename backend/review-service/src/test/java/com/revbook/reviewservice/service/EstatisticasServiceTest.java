@@ -33,7 +33,7 @@ class EstatisticasServiceTest {
 
     @Test
     void calcular_deveSomarContagensDosTresRepositorios() {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenhaA = new Resenha(livro, "Ótimo", 1L, "Fulano", null);
         Resenha resenhaB = new Resenha(livro, "Também ótimo", 1L, "Fulano", null);
 
@@ -51,7 +51,7 @@ class EstatisticasServiceTest {
 
     @Test
     void calcular_devePreencherNomeEAvatarViaComentario_quandoUsuarioNaoTemResenhas() {
-        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null);
+        Livro livro = new Livro("gb-1", "Dom Casmurro", "Machado de Assis", "Romance", null, null);
         Resenha resenha = new Resenha(livro, "Ótimo", 2L, "Outro Autor", null);
         Comentario comentario = new Comentario("Boa resenha", 1L, "Fulano", "https://avatar/fulano.png", resenha);
 

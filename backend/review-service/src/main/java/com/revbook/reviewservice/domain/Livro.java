@@ -70,4 +70,8 @@ public class Livro {
     public String getSinopse() {
         return sinopse;
     }
+
+    public void setSinopse(String sinopse) {
+        this.sinopse = sinopse;
+    }
 }

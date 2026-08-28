@@ -4,14 +4,21 @@ import { Star } from 'lucide-react';
 interface AvaliacaoEstrelasProps {
   media: number;
   total: number;
+  avaliacaoUsuario?: number | null;
   interativo?: boolean;
   onAvaliar?: (valor: number) => void;
 }
 
-export default function AvaliacaoEstrelas({ media, total, interativo, onAvaliar }: AvaliacaoEstrelasProps) {
+export default function AvaliacaoEstrelas({
+  media,
+  total,
+  avaliacaoUsuario,
+  interativo,
+  onAvaliar,
+}: AvaliacaoEstrelasProps) {
   const [hover, setHover] = useState<number | null>(null);
   const [brilhando, setBrilhando] = useState<number | null>(null);
-  const exibido = hover ?? Math.round(media);
+  const exibido = hover ?? avaliacaoUsuario ?? Math.round(media);
 
   const lidarClique = (n: number) => {
     if (!interativo) return;

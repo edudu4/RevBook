@@ -47,6 +47,9 @@ public class Resenha {
     @OneToMany(mappedBy = "resenha", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comentario> comentarios = new ArrayList<>();
 
+    @OneToMany(mappedBy = "resenha", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notificacao> notificacoes = new ArrayList<>();
+
     protected Resenha() {
     }
 
@@ -104,5 +107,9 @@ public class Resenha {
 
     public List<Comentario> getComentarios() {
         return comentarios;
+    }
+
+    public List<Notificacao> getNotificacoes() {
+        return notificacoes;
     }
 }

@@ -24,3 +24,5 @@ revbook:
     secret: ${JWT_SECRET}
   google-books:
     api-key: ${GOOGLE_BOOKS}
+  moderador:
+    email: ${MODERATOR_EMAIL:}

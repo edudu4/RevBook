@@ -32,6 +32,7 @@ public class Notificacao {
     @Column(nullable = false)
     private String nomeAtor;
 
+    @Column(columnDefinition = "text")
     private String avatarAtor;
 
     @Column(nullable = false)

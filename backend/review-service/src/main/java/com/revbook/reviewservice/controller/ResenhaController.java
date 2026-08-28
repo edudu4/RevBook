@@ -76,11 +76,11 @@ public class ResenhaController {
             @PathVariable Long id,
             @RequestBody UpdateReviewRequest dados,
             @UsuarioLogado UsuarioAutenticado usuario) {
-        return ReviewResponse.de(resenhaService.atualizar(id, usuario.id(), dados.content()));
+        return ReviewResponse.de(resenhaService.atualizar(id, usuario.id(), usuario.email(), dados.content()));
     }
 
     @DeleteMapping("/reviews/{id}")
     public void excluir(@PathVariable Long id, @UsuarioLogado UsuarioAutenticado usuario) {
-        resenhaService.excluir(id, usuario.id());
+        resenhaService.excluir(id, usuario.id(), usuario.email());
     }
 }

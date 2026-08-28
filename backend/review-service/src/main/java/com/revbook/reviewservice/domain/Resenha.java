@@ -33,6 +33,7 @@ public class Resenha {
     @Column(nullable = false)
     private String nomeUsuario;
 
+    @Column(columnDefinition = "text")
     private String avatarUsuario;
 
     @Column(nullable = false, updatable = false)

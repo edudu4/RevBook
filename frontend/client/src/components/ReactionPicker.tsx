@@ -7,7 +7,7 @@ interface ReactionPickerProps {
   onClose: () => void;
 }
 
-const EMOJIS_DISPONIVEIS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🎉', '💯'];
+const EMOJIS_DISPONIVEIS = ['👍', '❤️', '😂', '😮', '😢', '😡', '🔥', '🎉', '💯'];
 
 export default function ReactionPicker({ onSelecionarEmoji, isOpen, onClose }: ReactionPickerProps) {
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -34,9 +34,9 @@ export default function ReactionPicker({ onSelecionarEmoji, isOpen, onClose }: R
   return (
     <div
       ref={pickerRef}
-      className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-lg shadow-lg p-2 z-50 max-w-[calc(100vw-2rem)]"
+      className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-lg shadow-lg p-2 z-50 max-w-[calc(100vw-2rem)] overflow-x-auto"
     >
-      <div className="flex flex-wrap gap-1 max-w-[220px]">
+      <div className="flex flex-nowrap gap-1">
         {EMOJIS_DISPONIVEIS.map((emoji) => (
           <button
             key={emoji}
@@ -44,7 +44,7 @@ export default function ReactionPicker({ onSelecionarEmoji, isOpen, onClose }: R
               onSelecionarEmoji(emoji);
               onClose();
             }}
-            className="text-xl hover:scale-125 transition-transform cursor-pointer p-1"
+            className="text-xl hover:scale-125 transition-transform cursor-pointer p-1 flex-shrink-0"
             title={emoji}
           >
             {emoji}

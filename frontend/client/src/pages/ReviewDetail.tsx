@@ -132,7 +132,8 @@ export default function ReviewDetail() {
   const media = resenha.avaliacoes.length
     ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
     : 0;
-  const ehDono = isAuthenticated && user?.id === resenha.usuarioId;
+  const ehModerador = user?.email?.toLowerCase() === 'eduardoa8142@gmail.com';
+  const podeGerenciar = isAuthenticated && (user?.id === resenha.usuarioId || ehModerador);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -146,7 +147,7 @@ export default function ReviewDetail() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        <article className="bg-card border border-border rounded-lg p-4 sm:p-8">
+        <article className="bg-card border border-border rounded-lg p-4 sm:p-8 min-h-[26rem] min-w-full">
           <div className="flex gap-4 sm:gap-6 mb-6">
             <CapaLivro
               src={resenha.capaUrl}
@@ -189,7 +190,7 @@ export default function ReviewDetail() {
               </div>
             </div>
 
-            {ehDono && !editando && (
+            {podeGerenciar && !editando && (
               <div className="flex gap-1">
                 <button
                   onClick={() => {

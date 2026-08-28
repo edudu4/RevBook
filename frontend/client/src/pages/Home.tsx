@@ -32,6 +32,7 @@ export default function Home() {
   const [conteudoResenha, setConteudoResenha] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [buscando, setBuscando] = useState(false);
+  const [publicando, setPublicando] = useState(false);
 
   const paginaRef = useRef(0);
   const carregandoRef = useRef(false);
@@ -155,6 +156,7 @@ export default function Home() {
       return;
     }
 
+    setPublicando(true);
     try {
       const corpo: CreateReviewApiRequest = {
         googleBooksId: livroSelecionado.googleBooksId,
@@ -182,6 +184,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Failed to create review:', error);
+    } finally {
+      setPublicando(false);
     }
   };
 
@@ -442,11 +446,18 @@ export default function Home() {
             <div className="flex gap-3 mt-6">
               <Button
                 onClick={handleCriarResenha}
-                disabled={!livroSelecionado || !conteudoResenha.trim()}
+                disabled={!livroSelecionado || !conteudoResenha.trim() || publicando}
                 className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 title={!livroSelecionado ? 'Selecione um livro da busca para publicar' : undefined}
               >
-                Publicar Resenha
+                {publicando ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                    Publicando...
+                  </span>
+                ) : (
+                  'Publicar Resenha'
+                )}
               </Button>
               <Button
                 onClick={() => {
@@ -456,6 +467,7 @@ export default function Home() {
                 }}
                 variant="outline"
                 className="flex-1"
+                disabled={publicando}
               >
                 Cancelar
               </Button>

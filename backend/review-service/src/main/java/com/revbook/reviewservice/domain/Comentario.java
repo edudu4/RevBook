@@ -29,6 +29,7 @@ public class Comentario {
     @Column(nullable = false)
     private String nomeUsuario;
 
+    @Column(columnDefinition = "text")
     private String avatarUsuario;
 
     @ManyToOne

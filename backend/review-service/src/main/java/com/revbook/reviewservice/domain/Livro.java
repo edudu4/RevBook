@@ -16,14 +16,16 @@ public class Livro {
     @Column(nullable = false, unique = true)
     private String googleBooksId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String titulo;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String autor;
 
+    @Column(columnDefinition = "text")
     private String genero;
 
+    @Column(columnDefinition = "text")
     private String capaUrl;
 
     protected Livro() {

@@ -3,6 +3,7 @@ package com.revbook.reviewservice.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.revbook.reviewservice.domain.Comentario;
 import com.revbook.reviewservice.domain.Livro;
 import com.revbook.reviewservice.domain.Resenha;
+import com.revbook.reviewservice.domain.TipoNotificacao;
 import com.revbook.reviewservice.exception.NaoAutorizadoException;
 import com.revbook.reviewservice.repository.ComentarioRepository;
 import com.revbook.reviewservice.repository.ResenhaRepository;
@@ -54,7 +56,7 @@ class ComentarioServiceTest {
     void criar_deveLancarExcecao_quandoResenhaNaoExiste() {
         when(resenhaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> comentarioService.criar(1L, "Ótimo!", 2L, "Ciclano", null))
+        assertThatThrownBy(() -> comentarioService.criar(1L, "Ótimo!", 2L, "Ciclano", null, null))
                 .isInstanceOf(NoSuchElementException.class);
 
         verify(comentarioRepository, never()).save(any());
@@ -66,11 +68,54 @@ class ComentarioServiceTest {
         when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
         when(comentarioRepository.save(any(Comentario.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Comentario resultado = comentarioService.criar(1L, "Ótimo!", 2L, "Ciclano", "https://avatar");
+        Comentario resultado = comentarioService.criar(1L, "Ótimo!", 2L, "Ciclano", "https://avatar", null);
 
         assertThat(resultado.getConteudo()).isEqualTo("Ótimo!");
         assertThat(resultado.getResenha()).isEqualTo(resenha);
         assertThat(resultado.getAvatarUsuario()).isEqualTo("https://avatar");
+    }
+
+    @Test
+    void criar_deveNotificarAutorDoComentarioPai_quandoEhResposta() {
+        Resenha resenha = resenhaComId(1L);
+        Comentario comentarioPai = comentarioComId(10L, 3L, resenha);
+        when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
+        when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentarioPai));
+        when(comentarioRepository.save(any(Comentario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Comentario resposta = comentarioService.criar(1L, "Concordo!", 2L, "Ciclano", null, 10L);
+
+        assertThat(resposta.getComentarioPai()).isEqualTo(comentarioPai);
+        verify(notificacaoService)
+                .notificarUsuario(TipoNotificacao.RESPOSTA, resenha, 3L, 2L, "Ciclano", null);
+    }
+
+    @Test
+    void criar_naoDeveNotificarResposta_quandoUsuarioRespondePropriComentario() {
+        Resenha resenha = resenhaComId(1L);
+        Comentario comentarioPai = comentarioComId(10L, 2L, resenha);
+        when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
+        when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentarioPai));
+        when(comentarioRepository.save(any(Comentario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        comentarioService.criar(1L, "Complementando...", 2L, "Ciclano", null, 10L);
+
+        verify(notificacaoService, never())
+                .notificarUsuario(eq(TipoNotificacao.RESPOSTA), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void criar_deveLancarExcecao_quandoComentarioPaiNaoPertenceAResenha() {
+        Resenha resenha = resenhaComId(1L);
+        Resenha outraResenha = resenhaComId(2L);
+        Comentario comentarioPai = comentarioComId(10L, 3L, outraResenha);
+        when(resenhaRepository.findById(1L)).thenReturn(Optional.of(resenha));
+        when(comentarioRepository.findById(10L)).thenReturn(Optional.of(comentarioPai));
+
+        assertThatThrownBy(() -> comentarioService.criar(1L, "Concordo!", 2L, "Ciclano", null, 10L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(comentarioRepository, never()).save(any());
     }
 
     @Test

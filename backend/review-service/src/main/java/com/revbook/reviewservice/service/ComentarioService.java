@@ -33,14 +33,37 @@ public class ComentarioService {
         this.notificacaoService = notificacaoService;
     }
 
-    public Comentario criar(Long resenhaId, String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario) {
+    public Comentario criar(
+            Long resenhaId,
+            String conteudo,
+            Long usuarioId,
+            String nomeUsuario,
+            String avatarUsuario,
+            Long comentarioPaiId) {
         Resenha resenha = resenhaRepository.findById(resenhaId)
                 .orElseThrow(() -> new NoSuchElementException("Resenha não encontrada"));
 
-        Comentario comentario = new Comentario(conteudo, usuarioId, nomeUsuario, avatarUsuario, resenha);
+        Comentario comentarioPai = null;
+        if (comentarioPaiId != null) {
+            comentarioPai = comentarioRepository.findById(comentarioPaiId)
+                    .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
+            if (!comentarioPai.getResenha().getId().equals(resenhaId)) {
+                throw new IllegalArgumentException("Comentário pai não pertence a esta resenha");
+            }
+        }
+
+        Comentario comentario = new Comentario(conteudo, usuarioId, nomeUsuario, avatarUsuario, resenha, comentarioPai);
         comentario = comentarioRepository.save(comentario);
 
         notificacaoService.notificar(TipoNotificacao.COMENTARIO, resenha, usuarioId, nomeUsuario, avatarUsuario);
+
+        if (comentarioPai != null
+                && !comentarioPai.getUsuarioId().equals(usuarioId)
+                && !comentarioPai.getUsuarioId().equals(resenha.getUsuarioId())) {
+            notificacaoService.notificarUsuario(
+                    TipoNotificacao.RESPOSTA, resenha, comentarioPai.getUsuarioId(), usuarioId, nomeUsuario,
+                    avatarUsuario);
+        }
 
         return comentario;
     }

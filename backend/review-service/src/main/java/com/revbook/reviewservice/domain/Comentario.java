@@ -36,6 +36,10 @@ public class Comentario {
     @JoinColumn(name = "resenha_id", nullable = false)
     private Resenha resenha;
 
+    @ManyToOne
+    @JoinColumn(name = "comentario_pai_id")
+    private Comentario comentarioPai;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm = LocalDateTime.now();
 
@@ -44,15 +48,29 @@ public class Comentario {
     @OneToMany(mappedBy = "comentario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reacao> reacoes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comentarioPai", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> respostas = new ArrayList<>();
+
     protected Comentario() {
     }
 
     public Comentario(String conteudo, Long usuarioId, String nomeUsuario, String avatarUsuario, Resenha resenha) {
+        this(conteudo, usuarioId, nomeUsuario, avatarUsuario, resenha, null);
+    }
+
+    public Comentario(
+            String conteudo,
+            Long usuarioId,
+            String nomeUsuario,
+            String avatarUsuario,
+            Resenha resenha,
+            Comentario comentarioPai) {
         this.conteudo = conteudo;
         this.usuarioId = usuarioId;
         this.nomeUsuario = nomeUsuario;
         this.avatarUsuario = avatarUsuario;
         this.resenha = resenha;
+        this.comentarioPai = comentarioPai;
     }
 
     public Long getId() {
@@ -97,5 +115,13 @@ public class Comentario {
 
     public List<Reacao> getReacoes() {
         return reacoes;
+    }
+
+    public Comentario getComentarioPai() {
+        return comentarioPai;
+    }
+
+    public List<Comentario> getRespostas() {
+        return respostas;
     }
 }

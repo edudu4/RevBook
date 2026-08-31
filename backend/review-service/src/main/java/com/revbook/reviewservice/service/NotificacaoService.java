@@ -24,11 +24,17 @@ public class NotificacaoService {
     }
 
     public void notificar(TipoNotificacao tipo, Resenha resenha, Long autorId, String nomeAtor, String avatarAtor) {
-        if (resenha.getUsuarioId().equals(autorId)) {
+        notificarUsuario(tipo, resenha, resenha.getUsuarioId(), autorId, nomeAtor, avatarAtor);
+    }
+
+    public void notificarUsuario(
+            TipoNotificacao tipo, Resenha resenha, Long destinatarioId, Long autorId, String nomeAtor,
+            String avatarAtor) {
+        if (destinatarioId.equals(autorId)) {
             return;
         }
 
-        Notificacao notificacao = new Notificacao(resenha.getUsuarioId(), tipo, resenha, nomeAtor, avatarAtor);
+        Notificacao notificacao = new Notificacao(destinatarioId, tipo, resenha, nomeAtor, avatarAtor);
         notificacaoRepository.save(notificacao);
     }
 

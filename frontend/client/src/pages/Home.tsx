@@ -371,22 +371,21 @@ export default function Home() {
                 {resenha.conteudo}
               </p>
 
-              <div
-                className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-4 border-t border-border"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-4 border-t border-border">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
-                  <AvaliacaoEstrelas
-                    media={
-                      resenha.avaliacoes.length
-                        ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
-                        : 0
-                    }
-                    total={resenha.avaliacoes.length}
-                    avaliacaoUsuario={resenha.avaliacoes.find((a) => a.usuarioId === user?.id)?.valor}
-                    interativo={isAuthenticated}
-                    onAvaliar={(valor) => handleAvaliarResenha(resenha.id, valor)}
-                  />
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <AvaliacaoEstrelas
+                      media={
+                        resenha.avaliacoes.length
+                          ? resenha.avaliacoes.reduce((soma, a) => soma + a.valor, 0) / resenha.avaliacoes.length
+                          : 0
+                      }
+                      total={resenha.avaliacoes.length}
+                      avaliacaoUsuario={resenha.avaliacoes.find((a) => a.usuarioId === user?.id)?.valor}
+                      interativo={isAuthenticated}
+                      onAvaliar={(valor) => handleAvaliarResenha(resenha.id, valor)}
+                    />
+                  </span>
                   <span>{resenha.comentarios.length} comentários</span>
                 </div>
                 <Button

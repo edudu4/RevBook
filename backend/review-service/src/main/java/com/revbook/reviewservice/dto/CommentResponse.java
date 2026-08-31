@@ -12,7 +12,8 @@ public record CommentResponse(
         String userAvatar,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<ReactionResponse> reactions) {
+        List<ReactionResponse> reactions,
+        Long parentId) {
 
     public static CommentResponse de(Comentario comentario) {
         return new CommentResponse(
@@ -23,6 +24,7 @@ public record CommentResponse(
                 comentario.getAvatarUsuario(),
                 comentario.getCriadoEm(),
                 comentario.getAtualizadoEm(),
-                ReactionResponse.agrupar(comentario.getReacoes()));
+                ReactionResponse.agrupar(comentario.getReacoes()),
+                comentario.getComentarioPai() != null ? comentario.getComentarioPai().getId() : null);
     }
 }

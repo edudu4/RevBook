@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
-import { Bell, MessageSquare, Star } from 'lucide-react';
+import { Bell, MessageSquare, Reply, Star } from 'lucide-react';
 import { API_BASE_URL, type NotificationApi } from '@/lib/api';
 import { fetchAutenticado } from '@/lib/fetchAutenticado';
 import { paraNotificacao } from '@/lib/mapeadores';
@@ -150,6 +150,8 @@ export default function NotificationBell() {
                   <span className="mt-0.5 text-accent flex-shrink-0">
                     {notificacao.tipo === 'COMENTARIO' ? (
                       <MessageSquare className="w-4 h-4" />
+                    ) : notificacao.tipo === 'RESPOSTA' ? (
+                      <Reply className="w-4 h-4" />
                     ) : (
                       <Star className="w-4 h-4 fill-star text-star" />
                     )}
@@ -157,7 +159,11 @@ export default function NotificationBell() {
                   <span className="min-w-0">
                     <p className="text-sm text-foreground">
                       <span className="font-semibold">{notificacao.nomeAtor}</span>{' '}
-                      {notificacao.tipo === 'COMENTARIO' ? 'comentou em' : 'avaliou'}{' '}
+                      {notificacao.tipo === 'COMENTARIO'
+                        ? 'comentou em'
+                        : notificacao.tipo === 'RESPOSTA'
+                          ? 'respondeu seu comentário em'
+                          : 'avaliou'}{' '}
                       <span className="font-semibold">{notificacao.tituloLivro}</span>
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">{tempoRelativo(notificacao.criadoEm)}</p>

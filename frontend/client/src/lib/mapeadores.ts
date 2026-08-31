@@ -46,6 +46,7 @@ export function paraComentario(api: CommentApi): Comentario {
     criadoEm: api.createdAt,
     atualizadoEm: api.updatedAt,
     reacoes: (api.reactions ?? []).map(paraReacao),
+    parentId: api.parentId,
   };
 }
 

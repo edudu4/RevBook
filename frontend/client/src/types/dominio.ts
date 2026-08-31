@@ -26,6 +26,7 @@ export interface Comentario {
   criadoEm: string;
   atualizadoEm?: string;
   reacoes: Reacao[];
+  parentId?: number;
 }
 
 export interface ComentarioComResenha extends Comentario {
@@ -76,7 +77,7 @@ export interface FiltrosBusca {
 
 export interface Notificacao {
   id: number;
-  tipo: 'COMENTARIO' | 'AVALIACAO';
+  tipo: 'COMENTARIO' | 'AVALIACAO' | 'RESPOSTA';
   resenhaId: number;
   tituloLivro: string;
   nomeAtor: string;

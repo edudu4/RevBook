@@ -65,6 +65,24 @@ class NotificacaoServiceTest {
     }
 
     @Test
+    void notificarUsuario_deveSalvar_quandoDestinatarioDiferenteDoAutor() {
+        Resenha resenha = resenhaDoUsuario(1L);
+
+        notificacaoService.notificarUsuario(TipoNotificacao.RESPOSTA, resenha, 3L, 2L, "Ciclano", "https://avatar");
+
+        verify(notificacaoRepository).save(any(Notificacao.class));
+    }
+
+    @Test
+    void notificarUsuario_naoDeveSalvar_quandoDestinatarioEhOProprioAutor() {
+        Resenha resenha = resenhaDoUsuario(1L);
+
+        notificacaoService.notificarUsuario(TipoNotificacao.RESPOSTA, resenha, 2L, 2L, "Ciclano", null);
+
+        verify(notificacaoRepository, never()).save(any());
+    }
+
+    @Test
     void marcarComoLida_deveMarcar_quandoUsuarioEhDono() {
         Notificacao notificacao = notificacaoComId(10L, 1L);
         when(notificacaoRepository.findById(10L)).thenReturn(Optional.of(notificacao));

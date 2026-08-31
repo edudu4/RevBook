@@ -30,6 +30,7 @@ export interface CommentApi {
   createdAt: string;
   updatedAt?: string;
   reactions?: ReactionApi[];
+  parentId?: number;
 }
 
 export interface CommentWithReviewApi extends CommentApi {
@@ -84,7 +85,7 @@ export interface UserStatsApi {
 
 export interface NotificationApi {
   id: number;
-  type: 'COMENTARIO' | 'AVALIACAO';
+  type: 'COMENTARIO' | 'AVALIACAO' | 'RESPOSTA';
   reviewId: number;
   bookTitle: string;
   actorName: string;
